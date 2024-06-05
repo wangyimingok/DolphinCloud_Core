@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="FreeSql" Version="3.2.825" />
+		<PackageReference Include="FreeSql.Repository" Version="3.2.825" />
+		<PackageReference Include="FreeSql.Cloud" Version="1.8.3" />
+		<PackageReference Include="FreeSql.Provider.SqlServer" Version="3.2.825" />
+		<PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+		<PackageReference Include="Rougamo.Fody" Version="3.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+	</ItemGroup>
+	<!--添加全局引入命名空间-->
+	<ItemGroup>
+		<Using Include="FreeSql;" />
+		<Using Include="DolphinCloud.Common.Enums;" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\DolphinCloud.Common\DolphinCloud.Common.csproj" />
+	  <ProjectReference Include="..\DolphinCloud.DataEntity\DolphinCloud.DataEntity.csproj" />
+	</ItemGroup>
+</Project>

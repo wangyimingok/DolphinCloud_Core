@@ -1,0 +1,94 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.OMS.WebApplication", "DolphinCloud.OMS.WebApplication\DolphinCloud.OMS.WebApplication.csproj", "{5494FF91-B964-4CF3-9719-73E6B058024E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.Framework", "DolphinCloud.Framework\DolphinCloud.Framework.csproj", "{9A8B4605-3857-420D-8874-A36CDAA5C4DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.DataModel", "DolphinCloud.DataModel\DolphinCloud.DataModel.csproj", "{13BAF5D0-8890-41E7-BFB4-2DE5B1D479D7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.DataEntity", "DolphinCloud.DataEntity\DolphinCloud.DataEntity.csproj", "{7FE2F27A-B787-4CE1-B9BF-75179D66240A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.AutoMapper", "DolphinCloud.AutoMapper\DolphinCloud.AutoMapper.csproj", "{E51323B2-20A4-4B6A-8304-1A1818F329B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.DataServices", "DolphinCloud.DataServices\DolphinCloud.DataServices.csproj", "{9A5B90DF-994E-4236-901B-727C14290BD6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.Repository", "DolphinCloud.Repository\DolphinCloud.Repository.csproj", "{B02052C0-01EA-49D5-9B00-73F1CEF2D733}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.DataInterFace", "DolphinCloud.DataInterFace\DolphinCloud.DataInterFace.csproj", "{36A90EC1-BBC6-466F-B6A9-52D075E8B12D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{FA85BA57-1EEA-489E-87DB-6DA3E7633EBB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ORM", "ORM", "{0BEE6220-1B0F-428C-A0A9-11E6B1B867D3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{B37395E9-2A0B-4882-B72A-338630307902}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DolphinCloud.Common", "DolphinCloud.Common\DolphinCloud.Common.csproj", "{0A092061-CCFD-4A61-B03F-2DE52D2B59D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3C548A55-CF32-43F8-8ED9-C4EE0CFD7350}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5494FF91-B964-4CF3-9719-73E6B058024E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5494FF91-B964-4CF3-9719-73E6B058024E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5494FF91-B964-4CF3-9719-73E6B058024E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5494FF91-B964-4CF3-9719-73E6B058024E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A8B4605-3857-420D-8874-A36CDAA5C4DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A8B4605-3857-420D-8874-A36CDAA5C4DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A8B4605-3857-420D-8874-A36CDAA5C4DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A8B4605-3857-420D-8874-A36CDAA5C4DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13BAF5D0-8890-41E7-BFB4-2DE5B1D479D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13BAF5D0-8890-41E7-BFB4-2DE5B1D479D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13BAF5D0-8890-41E7-BFB4-2DE5B1D479D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13BAF5D0-8890-41E7-BFB4-2DE5B1D479D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FE2F27A-B787-4CE1-B9BF-75179D66240A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FE2F27A-B787-4CE1-B9BF-75179D66240A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FE2F27A-B787-4CE1-B9BF-75179D66240A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FE2F27A-B787-4CE1-B9BF-75179D66240A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E51323B2-20A4-4B6A-8304-1A1818F329B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E51323B2-20A4-4B6A-8304-1A1818F329B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E51323B2-20A4-4B6A-8304-1A1818F329B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E51323B2-20A4-4B6A-8304-1A1818F329B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A5B90DF-994E-4236-901B-727C14290BD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A5B90DF-994E-4236-901B-727C14290BD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A5B90DF-994E-4236-901B-727C14290BD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A5B90DF-994E-4236-901B-727C14290BD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B02052C0-01EA-49D5-9B00-73F1CEF2D733}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B02052C0-01EA-49D5-9B00-73F1CEF2D733}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B02052C0-01EA-49D5-9B00-73F1CEF2D733}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B02052C0-01EA-49D5-9B00-73F1CEF2D733}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36A90EC1-BBC6-466F-B6A9-52D075E8B12D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36A90EC1-BBC6-466F-B6A9-52D075E8B12D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36A90EC1-BBC6-466F-B6A9-52D075E8B12D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36A90EC1-BBC6-466F-B6A9-52D075E8B12D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A092061-CCFD-4A61-B03F-2DE52D2B59D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A092061-CCFD-4A61-B03F-2DE52D2B59D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A092061-CCFD-4A61-B03F-2DE52D2B59D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A092061-CCFD-4A61-B03F-2DE52D2B59D1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9A8B4605-3857-420D-8874-A36CDAA5C4DE} = {FA85BA57-1EEA-489E-87DB-6DA3E7633EBB}
+		{13BAF5D0-8890-41E7-BFB4-2DE5B1D479D7} = {0BEE6220-1B0F-428C-A0A9-11E6B1B867D3}
+		{7FE2F27A-B787-4CE1-B9BF-75179D66240A} = {0BEE6220-1B0F-428C-A0A9-11E6B1B867D3}
+		{E51323B2-20A4-4B6A-8304-1A1818F329B9} = {0BEE6220-1B0F-428C-A0A9-11E6B1B867D3}
+		{9A5B90DF-994E-4236-901B-727C14290BD6} = {B37395E9-2A0B-4882-B72A-338630307902}
+		{B02052C0-01EA-49D5-9B00-73F1CEF2D733} = {B37395E9-2A0B-4882-B72A-338630307902}
+		{36A90EC1-BBC6-466F-B6A9-52D075E8B12D} = {B37395E9-2A0B-4882-B72A-338630307902}
+		{0A092061-CCFD-4A61-B03F-2DE52D2B59D1} = {FA85BA57-1EEA-489E-87DB-6DA3E7633EBB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E852835A-6D9F-4B4C-B8DF-8E69DB82F617}
+	EndGlobalSection
+EndGlobal
