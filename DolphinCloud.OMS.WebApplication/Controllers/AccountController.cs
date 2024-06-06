@@ -16,7 +16,7 @@ namespace DolphinCloud.OMS.WebApplication.Controllers
     /// <summary>
     /// 账号控制器
     /// </summary>
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         /// <summary>
         /// 验证码接口

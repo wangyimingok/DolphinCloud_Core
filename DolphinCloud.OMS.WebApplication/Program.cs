@@ -11,6 +11,10 @@ using DolphinCloud.Common.ContractResolver;
 using DolphinCloud.Common.Constants;
 using DolphinCloud.Repository;
 using DolphinCloud.AutoMapper;
+using Microsoft.AspNetCore.Http.Features;
+using DolphinCloud.DataInterFace.System;
+using System.Reflection;
+using DolphinCloud.OMS.WebApplication.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 // 指定应用运行时配置文件
@@ -80,7 +84,7 @@ builder.Services.AddMiniProfiler(option =>
 builder.Services.AddFreeSQLORM(RootConfig);
 IocManager.Instance.AddConventionalRegistrar(new DolphinCloudOMSRegistrar());
 IocManager.Instance.RegisterAssemblyByConvention(typeof(DolphinCloudOMSRegistrar).Assembly);
-
+//builder.Services.InitSystemData();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -90,7 +94,21 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-
+app.Use(async (context, next) =>
+{
+    var menuData = context.RequestServices.GetService<IMenuDataInterFace>(); //.Get<IMenuDataInterFace>();
+    if (menuData != null)
+    {
+        var controllerList = Assembly.GetExecutingAssembly().GetTypes().Where(a=>a.BaseType==typeof(BaseController));
+        await menuData.InitMenuData(controllerList);
+    }
+    var userData = context.RequestServices.GetService<IUserDataInterFace>();
+    if (userData != null)
+    {
+        await userData.GenerateAdmin();
+    }
+    await next();
+});
 app.UseRouting();
 //启用权限验证
 app.UseAuthentication();

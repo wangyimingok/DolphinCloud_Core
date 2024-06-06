@@ -2,6 +2,9 @@
 using Castle.Windsor.MsDependencyInjection;
 using DolphinCloud.Common.Configuration;
 using DolphinCloud.Common.Constants;
+using DolphinCloud.DataInterFace.System;
+using DolphinCloud.Framework.Dependency;
+using DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
@@ -104,7 +107,7 @@ namespace DolphinCloud.OMS.WebApplication.Initialization
                   .AddCookie(option =>
                   {
                       //无权限跳转页面地址
-                      option.AccessDeniedPath = new PathString("/Account/AccessDenied"); 
+                      option.AccessDeniedPath = new PathString("/Account/AccessDenied");
                       option.LoginPath = new PathString("/Account/Login");
                       option.LogoutPath = new PathString("/Account/Logout");
                       option.Cookie = new CookieBuilder
@@ -158,5 +161,20 @@ namespace DolphinCloud.OMS.WebApplication.Initialization
             }
 
         }
+
+        //internal static void InitSystemData(this WebApplicationBuilder services)
+        //{
+        //    services.Services.BuildServiceProvider();
+        //    services.Services.GetService<IMenuDataInterFace>();
+        //     var menuData = IocManager.Instance.Resolve<IMenuDataInterFace>();
+        //    if (menuData != null)
+        //    {
+        //        var controllerList=  Assembly.GetExecutingAssembly().GetTypes().Where(a => !a.IsInterface && a.IsAssignableFrom(typeof(BaseController)));
+        //        foreach (var item in controllerList)
+        //        {
+        //            //item.GetMethods().Where(a=>a.Attributes.)
+        //        }
+        //    }
+        //}
     }
 }

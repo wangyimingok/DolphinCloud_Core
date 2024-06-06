@@ -1,4 +1,48 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@{
+    Layout = "_PageLayout";
+}
+
+<div class="layui-fluid">
+    <div class="layui-col-md12" style="margin-top: 15px;">
+        <table id="menuTable" lay-filter="menuTable"></table>
+    </div>
+</div>
+<script type="text/javascript">
+    var element = layui.element,
+        form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laytpl = layui.laytpl;
+    var index = parent.layer.getFrameIndex(window.name);
+    var tableIns = table.render({
+        elem: '#menuTable',
+        url: '@Url.Action("GetMenuTable", "Menu", new { area = "Admin" })',
+        method: "POST",
+        contentType: "application/json",
+        headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+        defaultToolbar: ['filter', 'print', 'exports'],
+        page: true,
+        cols: [[
+            { field: 'Id', title: 'ID', width: 80, sort: true },
+            { field: 'Name', title: '菜单名称', width: 200 },
+            { field: 'Url', title: '菜单地址', width: 200 },
+            { field: 'Icon', title: '图标', width: 100 },
+            { field: 'ParentId', title: '父级ID', width: 100 },
+            { field: 'Sort', title: '排序', width: 100 },
+            { field: 'IsShow', title: '是否显示', width: 100 },
+            { field: 'CreateTime', title: '创建时间', width: 200 },
+            { field: 'UpdateTime', title: '更新时间', width: 200 },
+            { fixed: 'right', title: '操作', width: 200, align: 'center', toolbar: '#menuBar' }
+        ]],
+        response: {
+            statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
+        }
+    });
+</script>

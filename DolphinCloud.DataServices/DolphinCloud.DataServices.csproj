@@ -6,6 +6,7 @@
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
 		<PackageReference Include="ZKWeb.System.Drawing" Version="4.0.1" />
@@ -13,5 +14,6 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\DolphinCloud.DataInterFace\DolphinCloud.DataInterFace.csproj" />
 	  <ProjectReference Include="..\DolphinCloud.DataModel\DolphinCloud.DataModel.csproj" />
+	  <ProjectReference Include="..\DolphinCloud.Repository\DolphinCloud.Repository.csproj" />
 	</ItemGroup>
 </Project>

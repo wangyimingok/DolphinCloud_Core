@@ -29,7 +29,7 @@ namespace DolphinCloud.DataEntity.System
         /// 创建时间
         /// </summary>
         [JsonProperty, Column(InsertValueSql = "getdate()")]
-        public DateTime CreateDateTime { get; set; }
+        public DateTimeOffset CreateDateTime { get; set; }
 
         /// <summary>
         /// 逻辑删除标志
@@ -59,7 +59,7 @@ namespace DolphinCloud.DataEntity.System
         /// 最后修改时间
         /// </summary>
         [JsonProperty, Column(InsertValueSql = "getdate()")]
-        public DateTime LastModifyDate { get; set; }
+        public DateTimeOffset LastModifyDate { get; set; }
 
         /// <summary>
         /// 备注

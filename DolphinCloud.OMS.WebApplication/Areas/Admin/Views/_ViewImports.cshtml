@@ -1,0 +1,9 @@
+﻿@using DolphinCloud.OMS.WebApplication
+@using DolphinCloud.OMS.WebApplication.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using StackExchange.Profiling
+@*防XRSF注入攻击Token生成器*@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+
+
+@addTagHelper *, MiniProfiler.AspNetCore.Mvc

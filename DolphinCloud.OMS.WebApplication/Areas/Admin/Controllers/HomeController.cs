@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DolphinCloud.OMS.WebApplication.Controllers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
 {
@@ -6,7 +7,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
     /// 管理端主页
     /// </summary>
     [Area("Admin")]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public IActionResult Index()
         {
