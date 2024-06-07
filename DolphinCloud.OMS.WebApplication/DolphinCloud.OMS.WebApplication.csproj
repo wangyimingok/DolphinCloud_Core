@@ -46,7 +46,7 @@
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>
-	  <Content Update="Areas\Admin\Views\Shared\_PageLayout.cshtml">
+	  <Content Update="Areas\Admin\Views\Shared\_AdminPageLayout.cshtml">
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>
@@ -58,28 +58,16 @@
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>
-	  <Content Update="Views\Shared\_AdminLayout.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
 	</ItemGroup>
 	<ItemGroup>
 	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\Components\SideBarNav\Default.cshtml" />
 	</ItemGroup>
 	<ItemGroup>
 	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\Components\SideBarNav\Default.cshtml" />
-	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_AdminLayout.cshtml" />
 	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_Header.cshtml" />
-	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_Layout.cshtml" />
-	</ItemGroup>
-	<ItemGroup>
-	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\_AdminLayout.cshtml" />
 	</ItemGroup>
 	<ItemGroup>
 	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\_Header.cshtml" />
-	</ItemGroup>
-	<ItemGroup>
-	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\_Layout.cshtml" />
 	</ItemGroup>
 
 </Project>

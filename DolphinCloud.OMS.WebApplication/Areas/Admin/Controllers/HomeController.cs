@@ -13,5 +13,10 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         {
             return View();
         }
+
+        public IActionResult Console()
+        {
+            return View();
+        }
     }
 }
