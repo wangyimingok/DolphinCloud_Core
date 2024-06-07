@@ -63,20 +63,24 @@ namespace DolphinCloud.DataServices.System
             }
         }
 
-        public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTableAsync(BasePagination pagination)
+        public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTableAsync(MenuParameter pagination)
         {
             try
             {
-                var MenuList = await _munuRepo.Select.Page(pagination.PageIndex, pagination.PageSize).Where(a => a.DeleteFG == false).ToListAsync();
+                long totalDataCount = 0;
+                var MenuList = await _munuRepo.Select
+                    .Page(pagination.PageIndex, pagination.PageSize)
+                    .Count(out totalDataCount)
+                    .Where(a => a.DeleteFG == false)
+                    .ToListAsync();
                 var DataModel = _mapper.Map<List<MenuInfo>, List<MenuDataViewModel>>(MenuList);
-
+                return new PaginationResult<List<MenuDataViewModel>>(ResponseCode.OperationSuccess, "查询成功", totalDataCount, DataModel);
             }
             catch (Exception ex)
             {
-
-                throw;
+                _logger.LogError(ex, $"分页查询菜单列表异常,异常原因为:【{ex.Message}】");
+                return new PaginationResult<List<MenuDataViewModel>>(ResponseCode.ServerError, $"分页查询菜单列表异常,异常原因为:【{ex.Message}】", 0, null);
             }
-            throw new NotImplementedException();
         }
 
         public Task InitMenuData(Type baseController)
@@ -146,7 +150,7 @@ namespace DolphinCloud.DataServices.System
                             item.ParentID = 0;
                             item.MenuUrlAddress = "#";
                         }
-                        await _munuRepo.InsertAsync(item);
+                        //await _munuRepo.InsertAsync(item);
                     }
                 }
 

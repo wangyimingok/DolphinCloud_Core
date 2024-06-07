@@ -94,21 +94,21 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-app.Use(async (context, next) =>
-{
-    var menuData = context.RequestServices.GetService<IMenuDataInterFace>(); //.Get<IMenuDataInterFace>();
-    if (menuData != null)
-    {
-        var controllerList = Assembly.GetExecutingAssembly().GetTypes().Where(a=>a.BaseType==typeof(BaseController));
-        await menuData.InitMenuData(controllerList);
-    }
-    var userData = context.RequestServices.GetService<IUserDataInterFace>();
-    if (userData != null)
-    {
-        await userData.GenerateAdmin();
-    }
-    await next();
-});
+//app.Use(async (context, next) =>
+//{
+//    var menuData = context.RequestServices.GetService<IMenuDataInterFace>(); //.Get<IMenuDataInterFace>();
+//    if (menuData != null)
+//    {
+//        var controllerList = Assembly.GetExecutingAssembly().GetTypes().Where(a=>a.BaseType==typeof(BaseController));
+//        await menuData.InitMenuData(controllerList);
+//    }
+//    var userData = context.RequestServices.GetService<IUserDataInterFace>();
+//    if (userData != null)
+//    {
+//        await userData.GenerateAdmin();
+//    }
+//    await next();
+//});
 app.UseRouting();
 //启用权限验证
 app.UseAuthentication();

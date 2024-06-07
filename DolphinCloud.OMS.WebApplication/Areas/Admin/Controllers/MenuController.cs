@@ -1,6 +1,8 @@
 ﻿using DolphinCloud.Common.Attributes;
 using DolphinCloud.Common.Enums;
+using DolphinCloud.Common.Pagination;
 using DolphinCloud.Common.Result;
+using DolphinCloud.DataInterFace.System;
 using DolphinCloud.DataModel.System.Menu;
 using DolphinCloud.OMS.WebApplication.Controllers;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +12,22 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
     /// <summary>
     /// 菜单控制器
     /// </summary>
+    [Area("Admin")]
     public class MenuController : BaseController
     {
+        private readonly ILogger<MenuController> _logger;
+
+        private readonly IMenuDataInterFace _menuData;
+        public MenuController(ILogger<MenuController> logger,IMenuDataInterFace menuDataInter)
+        {
+            _menuData=  menuDataInter;
+            _logger = logger;
+        }
         /// <summary>
         /// 菜单首页
         /// </summary>
         /// <returns></returns>
+        [HttpGet]
         [Menu(MunuType.RootMenu, "菜单管理", 99, "Admin")]
         public IActionResult Index()
         {
@@ -34,9 +46,11 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
             return await Task.FromResult(new JsonResult(""));
         }
 
-        public async Task<ResultMessage<MenuDataViewModel>> GetMenuTable()
-        { 
-            
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTable(MenuParameter pagination)
+        {
+            var result = await _menuData.GetMenuTableAsync(pagination);
+            return result;
         }
     }
 }

@@ -38,13 +38,13 @@ namespace DolphinCloud.DataModel.System.Menu
         /// 创建人
         /// </summary>
         [JsonProperty]
-        public int CreateBy { get; set; }
+        public string CreateBy { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
         [JsonProperty]
-        public DateTime CreateDateTime { get; set; }
+        public DateTimeOffset CreateDateTime { get; set; }
 
         /// <summary>
         /// 逻辑删除标志
@@ -56,13 +56,13 @@ namespace DolphinCloud.DataModel.System.Menu
         /// 最后修改人
         /// </summary>
         [JsonProperty]
-        public int LastModifyBy { get; set; }
+        public string LastModifyBy { get; set; }
 
         /// <summary>
         /// 最后修改时间
         /// </summary>
         [JsonProperty]
-        public DateTime LastModifyDate { get; set; }
+        public DateTimeOffset LastModifyDate { get; set; }
 
         /// <summary>
         /// 图标

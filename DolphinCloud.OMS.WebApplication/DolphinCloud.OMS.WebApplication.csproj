@@ -42,10 +42,44 @@
 		<Folder Include="Filters\" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Content Update="Areas\Admin\Views\Shared\Error.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Update="Areas\Admin\Views\Shared\_PageLayout.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Update="Areas\Admin\Views\Shared\_TabsView.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Update="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
 	  <Content Update="Views\Shared\_AdminLayout.cshtml">
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\Components\SideBarNav\Default.cshtml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\Components\SideBarNav\Default.cshtml" />
+	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_AdminLayout.cshtml" />
+	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_Header.cshtml" />
+	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_Layout.cshtml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\_AdminLayout.cshtml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\_Header.cshtml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\_Layout.cshtml" />
 	</ItemGroup>
 
 </Project>

@@ -30,6 +30,6 @@ namespace DolphinCloud.DataInterFace.System
         /// <returns></returns>
         Task<OperationMessage> CreateMenu(MenuCreateDataModel dataModel);
 
-        Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTableAsync(BasePagination pagination);
+        Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTableAsync(MenuParameter pagination);
     }
 }

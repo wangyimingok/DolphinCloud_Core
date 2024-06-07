@@ -9,6 +9,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
     /// <summary>
     /// 用户信息控制器
     /// </summary>
+    [Area("Admin")]
     public class UserController : BaseController
     {
         /// <summary>

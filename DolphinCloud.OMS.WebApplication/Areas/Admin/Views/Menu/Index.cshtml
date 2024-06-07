@@ -1,12 +1,12 @@
 ﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
-@functions{
+@functions {
     public string GetAntiXsrfRequestToken()
     {
         return Xsrf.GetAndStoreTokens(Context).RequestToken;
     }
 }
 @{
-    Layout = "_PageLayout";
+    Layout = "_Layout";
 }
 
 <div class="layui-fluid">
@@ -23,26 +23,34 @@
     var index = parent.layer.getFrameIndex(window.name);
     var tableIns = table.render({
         elem: '#menuTable',
-        url: '@Url.Action("GetMenuTable", "Menu", new { area = "Admin" })',
+        url: '/Admin/Menu/GetMenuTable',//'@Url.Action("GetMenuTable", "Menu", new { area = "Admin" })',
         method: "POST",
         contentType: "application/json",
         headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
         defaultToolbar: ['filter', 'print', 'exports'],
         page: true,
         cols: [[
-            { field: 'Id', title: 'ID', width: 80, sort: true },
-            { field: 'Name', title: '菜单名称', width: 200 },
-            { field: 'Url', title: '菜单地址', width: 200 },
-            { field: 'Icon', title: '图标', width: 100 },
-            { field: 'ParentId', title: '父级ID', width: 100 },
-            { field: 'Sort', title: '排序', width: 100 },
-            { field: 'IsShow', title: '是否显示', width: 100 },
-            { field: 'CreateTime', title: '创建时间', width: 200 },
-            { field: 'UpdateTime', title: '更新时间', width: 200 },
+            { field: 'menuID', title: '主键', width: 80, sort: true },
+            { field: 'parentID', title: '上级菜单主键', width: 200 },
+            { field: 'menuName', title: '菜单名称', width: 200 },
+            { field: 'menuType', title: '菜单类型', width: 100 },
+            { field: 'menuIcon', title: '菜单图标', width: 100 },
+            { field: 'areaName', title: '区域名称', width: 100 },
+            { field: 'controllerName', title: '控制器名称', width: 100 },
+            { field: 'actionName', title: '动作名称', width: 100 },
+            { field: 'menuUrlAddress', title: '链接地址', width: 100 },
+            { field: 'sortNumber', title: '排序', width: 100 },
+            { field: 'createBy', title: '创建人', width: 100 },
+            { field: 'createDateTime', title: '创建时间', width: 200 },
+            { field: 'lastModifyBy', title: '最后修改人', width: 200 },
+            { field: 'lastModifyDate', title: '最后修改时间', width: 200 },
+            { field: 'deleteFG', title: '是否逻辑删除', width: 200 },
             { fixed: 'right', title: '操作', width: 200, align: 'center', toolbar: '#menuBar' }
         ]],
         response: {
             statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
         }
     });
+
+
 </script>
