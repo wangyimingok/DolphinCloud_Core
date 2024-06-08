@@ -46,6 +46,11 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
             return await Task.FromResult(new JsonResult(""));
         }
 
+        /// <summary>
+        /// 获取菜单列表
+        /// </summary>
+        /// <param name="pagination"></param>
+        /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTable(MenuParameter pagination)
         {
