@@ -58,8 +58,8 @@ namespace DolphinCloud.DataEntity.System
         /// <summary>
         /// 创建时间
         /// </summary>
-        [JsonProperty, Column(InsertValueSql = "getdate()")]
-        public DateTimeOffset CreateDateTime { get; set; }
+        [JsonProperty]
+        public DateTimeOffset CreateDateTime { get; set; }= DateTimeOffset.Now;
 
         /// <summary>
         /// 逻辑删除标志
@@ -100,8 +100,8 @@ namespace DolphinCloud.DataEntity.System
         /// <summary>
         /// 最后修改时间
         /// </summary>
-        [JsonProperty, Column(InsertValueSql = "getdate()")]
-        public DateTimeOffset LastModifyDate { get; set; }
+        [JsonProperty]
+        public DateTimeOffset LastModifyDate { get; set; }= DateTimeOffset.Now;
 
 
         #region 外键 => 导航属性，ManyToOne/OneToOne

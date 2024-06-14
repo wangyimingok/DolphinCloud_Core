@@ -37,37 +37,5 @@
 		<ProjectReference Include="..\DolphinCloud.Framework\DolphinCloud.Framework.csproj" />
 		<ProjectReference Include="..\DolphinCloud.Repository\DolphinCloud.Repository.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Areas\Admin\Data\" />
-		<Folder Include="Filters\" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Update="Areas\Admin\Views\Shared\Error.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	  <Content Update="Areas\Admin\Views\Shared\_AdminPageLayout.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	  <Content Update="Areas\Admin\Views\Shared\_TabsView.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	  <Content Update="Areas\Admin\Views\Shared\_ValidationScriptsPartial.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	</ItemGroup>
-	<ItemGroup>
-	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\Components\SideBarNav\Default.cshtml" />
-	</ItemGroup>
-	<ItemGroup>
-	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\Components\SideBarNav\Default.cshtml" />
-	  <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_Header.cshtml" />
-	</ItemGroup>
-	<ItemGroup>
-	  <UpToDateCheckInput Remove="Areas\Admin\Views\Shared\_Header.cshtml" />
-	</ItemGroup>
 
 </Project>

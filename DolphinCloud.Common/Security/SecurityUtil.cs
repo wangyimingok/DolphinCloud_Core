@@ -30,7 +30,19 @@ namespace DolphinCloud.Common.Security
                 return strResult.Replace("-", "");
             }
         }
-
+        /// <summary>
+        /// MD5加密
+        /// 使用HexString方案
+        /// 高性能
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string MD5_HexConvert(string input)
+        {
+            var inputBytes = Encoding.UTF8.GetBytes(input);
+            var hashBytes = MD5.HashData(inputBytes);
+            return Convert.ToHexString(hashBytes);
+        }
         public static string MD5Encrypt16(string InputText)
         {
             using (var md5 = MD5.Create())

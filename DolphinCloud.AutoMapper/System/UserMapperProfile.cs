@@ -18,6 +18,7 @@ namespace DolphinCloud.AutoMapper.System
         {
             CreateMap<UserDataViewModel, UserInfo>().ReverseMap();
             CreateMap<UserCreateDataModel, UserInfo>().ReverseMap();
+            CreateMap<UserModifyDataModel, UserInfo>().ReverseMap();
         }
     }
 }

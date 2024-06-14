@@ -16,7 +16,7 @@ namespace DolphinCloud.DataEntity.System
         /// <summary>
         /// 用户信息主键
         /// </summary>
-        [JsonProperty, Column(IsPrimary = true, IsIdentity = true)]
+        [JsonProperty, Column(IsPrimary = true)]
         public long UserID { get; set; }
 
         /// <summary>
@@ -28,8 +28,8 @@ namespace DolphinCloud.DataEntity.System
         /// <summary>
         /// 创建时间
         /// </summary>
-        [JsonProperty, Column(InsertValueSql = "getdate()")]
-        public DateTimeOffset CreateDateTime { get; set; }
+        [JsonProperty]
+        public DateTimeOffset CreateDateTime { get; set; }=DateTimeOffset.Now;
 
         /// <summary>
         /// 逻辑删除标志
@@ -76,8 +76,8 @@ namespace DolphinCloud.DataEntity.System
         /// <summary>
         /// 最后修改时间
         /// </summary>
-        [JsonProperty, Column(InsertValueSql = "getutcdate()")]
-        public DateTimeOffset LastModifyDate { get; set; }
+        [JsonProperty]
+        public DateTimeOffset LastModifyDate { get; set; }= DateTimeOffset.Now;
 
         /// <summary>
         /// 手机号码
@@ -88,7 +88,7 @@ namespace DolphinCloud.DataEntity.System
         /// <summary>
         /// 密码
         /// </summary>
-        [JsonProperty, Column(StringLength = 50, IsNullable = false)]
+        [JsonProperty, Column(StringLength = 100, IsNullable = false)]
         public string PassWord { get; set; }
 
         /// <summary>
