@@ -45,9 +45,10 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// <returns></returns>
         [Menu(MunuType.Button_Function, "创建用户", 2, "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
-        public Task<JsonResult> Create(UserCreateDataModel dataModel)
+        public async Task<JsonResult> Create(UserCreateDataModel dataModel)
         {
-            return Task.FromResult(Json(""));
+            var result = await _user.CreateUser(dataModel);
+            return new JsonResult(result);
         }
 
         /// <summary>
@@ -89,6 +90,42 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         public async Task<JsonResult> Edit([FromBody] UserModifyDataModel dataModel)
         {
             var result = await _user.UpdateUserDataAsync(dataModel);
+            return Json(result);
+        }
+
+        /// <summary>
+        /// 校验用户名是否存在
+        /// </summary>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<JsonResult> UserNameIsExist(string UserName)
+        {
+            var result = await _user.UserNameIsExistAsync(UserName);
+            return Json(result);
+        }
+
+        /// <summary>
+        /// 校验邮箱地址是否存在
+        /// </summary>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<JsonResult> EmailAddressIsExist(string UserName)
+        {
+            var result = await _user.UserNameIsExistAsync(UserName);
+            return Json(result);
+        }
+
+        /// <summary>
+        /// 校验手机号码是否存在
+        /// </summary>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<JsonResult> MobilePhoneIsExist(string UserName)
+        {
+            var result = await _user.UserNameIsExistAsync(UserName);
             return Json(result);
         }
     }

@@ -7,11 +7,14 @@ using DolphinCloud.DataEntity.System;
 using DolphinCloud.DataInterFace.System;
 using DolphinCloud.DataModel.System.Menu;
 using DolphinCloud.DataModel.System.User;
+using DolphinCloud.Framework.Session;
 using DolphinCloud.Repository.System;
+using FreeScheduler;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,11 +39,14 @@ namespace DolphinCloud.DataServices.System
         /// </summary>
         private readonly UserRepository _userRepo;
 
-        public UserDataService(ILogger<UserDataService> logger, IMapper mapper, UserRepository userRepository)
+        private readonly ICurrentUserInfo _currentUser;
+
+        public UserDataService(ILogger<UserDataService> logger, IMapper mapper, UserRepository userRepository, ICurrentUserInfo currentUserInfo)
         {
             _logger = logger;
             _mapper = mapper;
             _userRepo = userRepository;
+            _currentUser = currentUserInfo;
         }
 
         /// <summary>
@@ -60,7 +66,14 @@ namespace DolphinCloud.DataServices.System
                 else
                 {
                     UserData.UserID = IdHelper.GetLongId();
-                    UserData.CreateBy = "System";
+                    if (string.IsNullOrEmpty(_currentUser.UserName))
+                    {
+                        UserData.CreateBy = "System";
+                    }
+                    else
+                    {
+                        UserData.CreateBy = _currentUser.UserName;
+                    }
                     UserData.CreateDateTime = DateTimeOffset.Now;
                     UserData.LastModifyBy = "System";
                     UserData.LastModifyDate = DateTimeOffset.Now;
@@ -72,6 +85,32 @@ namespace DolphinCloud.DataServices.System
             {
                 _logger.LogError(ex, $"创建用户异常,异常原因为:【{ex.Message}】");
                 return new OperationMessage(ResponseCode.ServerError, $"创建用户异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 检查邮箱地址是否被占用
+        /// </summary>
+        /// <param name="emailAddress"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> EMailAddressIsExistAsync(string emailAddress)
+        {
+            try
+            {
+                var isExist = await _userRepo.Select.Where(a => a.EMailAddress == emailAddress).AnyAsync();
+                if (isExist)
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, $"邮箱地址【{emailAddress}】在系统中已存在,请更换一个邮箱地址再试!");
+                }
+                else
+                {
+                    return new OperationMessage(ResponseCode.OperationSuccess, "此邮箱地址未被占用,可以使用");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"检查邮箱地址是否被占用出现异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"检查邮箱地址是否被占用出现异常,异常原因为:【{ex.Message}】");
             }
         }
 
@@ -161,6 +200,32 @@ namespace DolphinCloud.DataServices.System
         }
 
         /// <summary>
+        /// 手机号码是否被占用
+        /// </summary>
+        /// <param name="MobilePhone"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> MobilePhoneIsExistAsync(string MobilePhone)
+        {
+            try
+            {
+                var isExist = await _userRepo.Select.Where(a => a.MobileNumber == MobilePhone).AnyAsync();
+                if (isExist)
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, $"手机号码【{MobilePhone}】在系统中已存在,请更换一个手机号码再试!");
+                }
+                else
+                {
+                    return new OperationMessage(ResponseCode.OperationSuccess, "此手机号码未被占用,可以使用");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"检查手机号码是否被占用出现异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"检查手机号码是否被占用出现异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
         /// 更新用户信息
         /// </summary>
         /// <param name="dataModel"></param>
@@ -189,6 +254,32 @@ namespace DolphinCloud.DataServices.System
             {
                 _logger.LogError(ex, $"更新用户信息异常,异常原因为:【{ex.Message}】");
                 return new OperationMessage(ResponseCode.ServerError, $"更新用户信息异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 检查用户名是否已存在
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> UserNameIsExistAsync(string userName)
+        {
+            try
+            {
+                var isExist = await _userRepo.Select.Where(a => a.UserName == userName).AnyAsync();
+                if (isExist)
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, $"用户名【{userName}】在系统中已存在,请更换一个用户名再试!");
+                }
+                else
+                {
+                    return new OperationMessage(ResponseCode.OperationSuccess, "此用户名未被占用,可以使用");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"检查用户名是否被占用出现异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"检查用户名是否被占用出现异常,异常原因为:【{ex.Message}】");
             }
         }
     }

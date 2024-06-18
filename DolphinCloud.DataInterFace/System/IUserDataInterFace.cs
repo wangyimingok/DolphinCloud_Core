@@ -42,6 +42,30 @@ namespace DolphinCloud.DataInterFace.System
         /// <param name="dataModel"></param>
         /// <returns></returns>
         Task<OperationMessage> UpdateUserDataAsync(UserModifyDataModel dataModel);
-       
+
+
+        /// <summary>
+        /// 判断用户名是否已存在
+        /// 异步方法
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        Task<OperationMessage> UserNameIsExistAsync(string userName);
+
+        /// <summary>
+        /// 判断邮箱地址是否已存在
+        /// 异步方法
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        Task<OperationMessage> EMailAddressIsExistAsync(string emailAddress);
+
+        /// <summary>
+        /// 判断手机号码是否已存在
+        /// 异步方法
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        Task<OperationMessage> MobilePhoneIsExistAsync(string MobilePhone);
     }
 }

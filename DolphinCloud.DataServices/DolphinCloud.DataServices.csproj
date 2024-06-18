@@ -14,6 +14,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\DolphinCloud.DataInterFace\DolphinCloud.DataInterFace.csproj" />
 	  <ProjectReference Include="..\DolphinCloud.DataModel\DolphinCloud.DataModel.csproj" />
+	  <ProjectReference Include="..\DolphinCloud.Framework\DolphinCloud.Framework.csproj" />
 	  <ProjectReference Include="..\DolphinCloud.Repository\DolphinCloud.Repository.csproj" />
 	</ItemGroup>
 </Project>
