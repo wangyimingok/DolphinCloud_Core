@@ -1,6 +1,8 @@
 ﻿using DolphinCloud.Common.Configuration;
 using DolphinCloud.Common.Enums;
+using DolphinCloud.Common.Result;
 using DolphinCloud.DataInterFace.Base;
+using DolphinCloud.DataInterFace.System;
 using DolphinCloud.DataModel.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -34,12 +36,15 @@ namespace DolphinCloud.OMS.WebApplication.Controllers
         /// 日志记录接口
         /// </summary>
         private readonly ILogger<AccountController> _logger;
-        public AccountController(ILogger<AccountController> logger, ICaptchaDataInterFace captchaDataInterFace, IHttpContextAccessor httpContextAccessor, IRootConfiguration rootConfiguration)
+
+        private readonly IUserDataInterFace _userData;
+        public AccountController(ILogger<AccountController> logger, ICaptchaDataInterFace captchaDataInterFace, IHttpContextAccessor httpContextAccessor, IRootConfiguration rootConfiguration, IUserDataInterFace userDataInterFace)
         {
             _logger = logger;
             _captcha = captchaDataInterFace;
             _httpContext = httpContextAccessor?.HttpContext;
             _jwtTokenConfig = rootConfiguration.AuthenConfiguration.JwtBearerOptions;
+            _userData = userDataInterFace;
         }
 
 
@@ -65,68 +70,68 @@ namespace DolphinCloud.OMS.WebApplication.Controllers
         /// <param name="loginData"></param>
         /// <returns></returns>
         [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginDataModel loginData)
+        public async Task<JsonResult> Login(LoginDataModel loginData)
         {
-            AuthenticationProperties properties = null;
-            if (loginData.RememberMe)
-            {
-                properties = new AuthenticationProperties
-                {
-                    //是否记住我 持久化Cookie
-                    IsPersistent = loginData.RememberMe,
-                    //登录信息15天有效
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(15),
-                    //身份验证时间
-                    IssuedUtc = DateTime.UtcNow,
-                    //是否应允许刷新身份验证会话
-                    AllowRefresh = true,
-                    //登录完成后跳转地址
-                    //RedirectUri = loginData.ReturnURLAddress
-                };
-            }
-            //配置用户的身份特征 
-            Claim[] claims = new Claim[] {
-                                        //加入用户ID声明
-                                        new Claim(ClaimTypes.NameIdentifier, "123456"),
-                                        //加入用户邮箱声明
-                                        new Claim(ClaimTypes.Email, "123456@123.com"),
-                                        //加入用户名声明
-                                        new Claim(ClaimTypes.Name,loginData.UserName),
-                                        //加入用户手机号码声明
-                                    new Claim(ClaimTypes.MobilePhone,"TestPhone")
-                                    // new Claim(ClaimTypes.PrimarySid,UserData.Phone)
-                                    };
-            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal();
-            claimsPrincipal.AddIdentity(identity);
             try
             {
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, properties);
+                var result = await _userData.LoginValidateAsync(loginData);
+                if (result.Code == ResponseCode.OperationSuccess)
+                {
+                    var userData = result.Data;
+                    if (userData != null)
+                    {
+                        AuthenticationProperties properties = null;
+                        if (loginData.RememberMe)
+                        {
+                            properties = new AuthenticationProperties
+                            {
+                                //是否记住我 持久化Cookie
+                                IsPersistent = loginData.RememberMe,
+                                //登录信息8小时有效
+                                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
+                                //身份验证时间
+                                IssuedUtc = DateTime.UtcNow,
+                                //是否应允许刷新身份验证会话
+                                AllowRefresh = true,
+                                //登录完成后跳转地址
+                                //RedirectUri = loginData.ReturnURLAddress
+                            };
+                        }
+                        //配置用户的身份特征 
+                        Claim[] claims = new Claim[] {
+                                        //加入用户ID声明
+                                        new Claim(ClaimTypes.NameIdentifier, userData.UserID.ToString()),
+                                        //加入用户邮箱声明
+                                        new Claim(ClaimTypes.Email, userData.EMailAddress),
+                                        //加入用户名声明
+                                        new Claim(ClaimTypes.Name,userData.UserName),
+                                        //加入用户手机号码声明
+                                    new Claim(ClaimTypes.MobilePhone,userData.MobileNumber),
+                                    new Claim(ClaimTypes.GivenName,userData.RealName)
+                                    // new Claim(ClaimTypes.PrimarySid,UserData.Phone)
+                                    };
+                        ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal();
+                        claimsPrincipal.AddIdentity(identity);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, properties);
+                        return new JsonResult(new OperationMessage(ResponseCode.OperationSuccess, "登录成功"));
+                    }
+                    else
+                    {
+                        return new JsonResult(new OperationMessage(ResponseCode.OperationWarning, $"登录失败,失败原因为;【未获得相关用户信息】"));
+                    }
+                }
+                else
+                {
+                    return new JsonResult(new OperationMessage(ResponseCode.OperationWarning, $"登录失败,失败原因为;【{result.Message}】"));
+                }
                 //return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "登录验证出现异常");
+                return new JsonResult(new OperationMessage(ResponseCode.ServerError, $"登录验证出现异常,异常原因为:【{ex.Message}】"));
             }
-
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_jwtTokenConfig.SecretKey)
-            );
-            var signCredential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var jwtToken = new JwtSecurityToken(
-                issuer: _jwtTokenConfig.Issuer,
-                audience: _jwtTokenConfig.Audience,
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(_jwtTokenConfig.ExpireMinutes),
-                signingCredentials: signCredential
-            );
-
-            return Ok(new
-            {
-                responseCode = 200,
-                access_token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
-                expiration = TimeZoneInfo.ConvertTimeFromUtc(jwtToken.ValidTo, TimeZoneInfo.Local)
-            });
         }
 
         /// <summary>

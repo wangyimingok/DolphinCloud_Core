@@ -45,10 +45,34 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// <returns></returns>
         [Menu(MunuType.Button_Function, "创建用户", 2, "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<JsonResult> Create(UserCreateDataModel dataModel)
+        public async Task<JsonResult> CreateUser([FromBody] UserCreateDataModel dataModel)
         {
-            var result = await _user.CreateUser(dataModel);
-            return new JsonResult(result);
+            if (string.IsNullOrWhiteSpace(dataModel.UserName))
+            {
+                var result = new OperationMessage(ResponseCode.OperationWarning, "用户名不能为空");
+                return new JsonResult(result);
+            }
+            if (string.IsNullOrWhiteSpace(dataModel.MobileNumber))
+            {
+                var result = new OperationMessage(ResponseCode.OperationWarning, "手机号码不能为空");
+                return new JsonResult(result);
+            }
+            if (string.IsNullOrWhiteSpace(dataModel.EMailAddress))
+            {
+                var result = new OperationMessage(ResponseCode.OperationWarning, "邮箱地址不能为空");
+                return new JsonResult(result);
+            }
+            if (dataModel != null)
+            {
+                var result = await _user.CreateUser(dataModel);
+                return new JsonResult(result);
+            }
+            else
+            {
+                var result = new OperationMessage(ResponseCode.OperationWarning, "参数错误");
+                return new JsonResult(result);
+            }
+
         }
 
         /// <summary>

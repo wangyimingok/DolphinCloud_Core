@@ -1,4 +1,5 @@
 ﻿using DolphinCloud.Common.Result;
+using DolphinCloud.DataModel.Account;
 using DolphinCloud.DataModel.System.User;
 
 namespace DolphinCloud.DataInterFace.System
@@ -67,5 +68,12 @@ namespace DolphinCloud.DataInterFace.System
         /// <param name="dataModel"></param>
         /// <returns></returns>
         Task<OperationMessage> MobilePhoneIsExistAsync(string MobilePhone);
+
+        /// <summary>
+        /// 登陆验证
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        Task<ResultMessage<LoginViewModel>> LoginValidateAsync(LoginDataModel dataModel);
     }
 }

@@ -5,6 +5,7 @@ using DolphinCloud.Common.Security;
 using DolphinCloud.Common.Snowflake;
 using DolphinCloud.DataEntity.System;
 using DolphinCloud.DataInterFace.System;
+using DolphinCloud.DataModel.Account;
 using DolphinCloud.DataModel.System.Menu;
 using DolphinCloud.DataModel.System.User;
 using DolphinCloud.Framework.Session;
@@ -59,13 +60,22 @@ namespace DolphinCloud.DataServices.System
             try
             {
                 var UserData = _mapper.Map<UserCreateDataModel, UserInfo>(dataModel);
-                if (await _userRepo.Where(a => a.EMailAddress == UserData.EMailAddress || a.MobileNumber == UserData.MobileNumber || a.UserName == UserData.UserName).AnyAsync())
+                if (await _userRepo.Where(a => a.UserName == UserData.UserName).AnyAsync())
                 {
-                    return new OperationMessage(Common.Enums.ResponseCode.OperationWarning, $"用户【{UserData.UserName}】已存在");
+                    return new OperationMessage(ResponseCode.OperationWarning, $"用户名【{UserData.UserName}】已存在");
+                }
+                if (await _userRepo.Where(a => a.EMailAddress == UserData.EMailAddress).AnyAsync())
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, $"邮箱地址【{UserData.EMailAddress}】已存在");
+                }
+                if (await _userRepo.Where(a => a.MobileNumber == UserData.MobileNumber).AnyAsync())
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, $"手机号码【{UserData.MobileNumber}】已存在");
                 }
                 else
                 {
                     UserData.UserID = IdHelper.GetLongId();
+                    UserData.PassWord = SecurityUtil.MD5_HexConvert(SecurityUtil.Base64Encode(dataModel.PassWord));
                     if (string.IsNullOrEmpty(_currentUser.UserName))
                     {
                         UserData.CreateBy = "System";
@@ -280,6 +290,41 @@ namespace DolphinCloud.DataServices.System
             {
                 _logger.LogError(ex, $"检查用户名是否被占用出现异常,异常原因为:【{ex.Message}】");
                 return new OperationMessage(ResponseCode.ServerError, $"检查用户名是否被占用出现异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 登陆验证
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        public async Task<ResultMessage<LoginViewModel>> LoginValidateAsync(LoginDataModel dataModel)
+        {
+            try
+            {
+                var userData = await _userRepo.Select.Where(a => a.UserName == dataModel.UserName).ToOneAsync();
+                if (userData != null && userData != default)
+                {
+                    string passWord = SecurityUtil.MD5_HexConvert(SecurityUtil.Base64Encode(dataModel.PassWord));
+                    if (userData.PassWord.Equals(passWord,StringComparison.OrdinalIgnoreCase))
+                    {
+                        var loginData = _mapper.Map<UserInfo, LoginViewModel>(userData);
+                        return new ResultMessage<LoginViewModel>(ResponseCode.OperationSuccess, "登陆验证成功", loginData);
+                    }
+                    else
+                    {
+                        return new ResultMessage<LoginViewModel>(ResponseCode.OperationWarning, "密码错误");
+                    }
+                }
+                else
+                {
+                    return new ResultMessage<LoginViewModel>(ResponseCode.OperationWarning, "用户名不存在");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"登陆验证出现异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<LoginViewModel>(ResponseCode.ServerError, $"登陆验证出现异常,异常原因为:【{ex.Message}】");
             }
         }
     }

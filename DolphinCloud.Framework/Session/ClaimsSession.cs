@@ -96,7 +96,7 @@ namespace DolphinCloud.Framework.Session
         {
             get
             {
-                var userNameClaim = ClaimList?.FirstOrDefault(c => c.Type == "name");
+                var userNameClaim = ClaimList?.FirstOrDefault(c => c.Type == ClaimTypes.Name);
                 if (string.IsNullOrEmpty(userNameClaim?.Value))
                 {
                     var clientidClaim = ClaimList?.FirstOrDefault(c => c.Type == "client_id");
@@ -119,7 +119,7 @@ namespace DolphinCloud.Framework.Session
         {
             get
             {
-                var UserMobilePhoneClaim = ClaimList?.FirstOrDefault(c => c.Type == "phone_number");
+                var UserMobilePhoneClaim = ClaimList?.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone);
                 if (string.IsNullOrEmpty(UserMobilePhoneClaim?.Value))
                 {
                     return null;

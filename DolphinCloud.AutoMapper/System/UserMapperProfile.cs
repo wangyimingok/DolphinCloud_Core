@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DolphinCloud.DataEntity.System;
+using DolphinCloud.DataModel.Account;
 using DolphinCloud.DataModel.System.User;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ namespace DolphinCloud.AutoMapper.System
             CreateMap<UserDataViewModel, UserInfo>().ReverseMap();
             CreateMap<UserCreateDataModel, UserInfo>().ReverseMap();
             CreateMap<UserModifyDataModel, UserInfo>().ReverseMap();
+            CreateMap<LoginViewModel, UserInfo>().ReverseMap();
+            
         }
     }
 }
