@@ -75,5 +75,12 @@ namespace DolphinCloud.DataInterFace.System
         /// <param name="dataModel"></param>
         /// <returns></returns>
         Task<ResultMessage<LoginViewModel>> LoginValidateAsync(LoginDataModel dataModel);
+
+        /// <summary>
+        /// 逻辑删除用户数据
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        Task<OperationMessage> DeleteUserAsync(UserDataViewModel dataModel);
     }
 }

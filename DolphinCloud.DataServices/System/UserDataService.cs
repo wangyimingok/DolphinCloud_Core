@@ -99,6 +99,31 @@ namespace DolphinCloud.DataServices.System
         }
 
         /// <summary>
+        /// 逻辑删除用户数据
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> DeleteUserAsync(UserDataViewModel dataModel)
+        {
+            try
+            {
+                var CurrentDataEntity = await _userRepo.Select.Where(a => a.UserID == dataModel.UserID&&a.UserName==dataModel.UserName&&a.EMailAddress==dataModel.EMailAddress&&a.MobileNumber==dataModel.MobileNumber).ToUpdate().Set(a=>a.DeleteFG,true).Set(a=>a.LastModifyBy,_currentUser.UserName).Set(a=>a.LastModifyDate, DateTimeOffset.Now).ExecuteAffrowsAsync();
+                if (CurrentDataEntity > 0)
+                {
+                    return new OperationMessage(ResponseCode.OperationSuccess, "删除用户成功");
+                }
+                else
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, "未查询到符合条件的用户信息数据,删除失败");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"逻辑删除用户异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"逻辑删除用户异常,异常原因为:【{ex.Message}】");
+            }
+        }
+        /// <summary>
         /// 检查邮箱地址是否被占用
         /// </summary>
         /// <param name="emailAddress"></param>
@@ -252,6 +277,8 @@ namespace DolphinCloud.DataServices.System
                           .SetIf(dataModel.EMailAddress != CurrentDataEntity.EMailAddress, a => a.EMailAddress, dataModel.EMailAddress)
                           .SetIf(dataModel.RealName != CurrentDataEntity.RealName, a => a.RealName, dataModel.RealName)
                           .SetIf(dataModel.Status != CurrentDataEntity.Status, a => a.Status, dataModel.Status)
+                          .Set(a => a.LastModifyBy, _currentUser.UserName)
+                          .Set(a => a.LastModifyDate, DateTimeOffset.Now)
                           .Where(a => a.UserID == dataModel.UserID).ExecuteAffrowsAsync();
                     return new OperationMessage(ResponseCode.OperationSuccess, "用户信息更新成功");
                 }
@@ -302,11 +329,11 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var userData = await _userRepo.Select.Where(a => a.UserName == dataModel.UserName).ToOneAsync();
+                var userData = await _userRepo.Select.Where(a => a.UserName == dataModel.UserName && a.DeleteFG == false).ToOneAsync();
                 if (userData != null && userData != default)
                 {
                     string passWord = SecurityUtil.MD5_HexConvert(SecurityUtil.Base64Encode(dataModel.PassWord));
-                    if (userData.PassWord.Equals(passWord,StringComparison.OrdinalIgnoreCase))
+                    if (userData.PassWord.Equals(passWord, StringComparison.OrdinalIgnoreCase))
                     {
                         var loginData = _mapper.Map<UserInfo, LoginViewModel>(userData);
                         return new ResultMessage<LoginViewModel>(ResponseCode.OperationSuccess, "登陆验证成功", loginData);

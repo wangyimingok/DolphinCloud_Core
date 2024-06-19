@@ -1,4 +1,5 @@
 using DolphinCloud.Common.Attributes;
+using DolphinCloud.Common.Constants;
 using DolphinCloud.Common.Enums;
 using DolphinCloud.OMS.WebApplication.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,7 @@ namespace DolphinCloud.OMS.WebApplication.Controllers
     /// <summary>
     /// Ê×Ò³
     /// </summary>
-    [Authorize]
+    [Authorize(Policy = Permissions.ClientArea)]
     public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;

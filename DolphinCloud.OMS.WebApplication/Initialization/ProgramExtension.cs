@@ -7,6 +7,7 @@ using DolphinCloud.Framework.Dependency;
 using DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.Options;
@@ -90,11 +91,14 @@ namespace DolphinCloud.OMS.WebApplication.Initialization
         /// <param name="services"></param>
         internal static void ConfigAuthentication(this IServiceCollection services, AuthenticationConfiguration configuration)
         {
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("Administrator"));
-            //    options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
-            //});
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Permissions.AdminArea, policy => policy.Requirements.Add(new AdminAreaRequirement("管理端")));
+                 options.AddPolicy(Permissions.ClientArea, policy => policy.Requirements.Add(new AdminAreaRequirement("客户端")));
+                //options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
+            });
+            services.AddSingleton<IAuthorizationHandler, AdminAreaAccessHandler>();
+
             if (configuration.CookieOptions.IsEnabledCookie)
             {
                 var cookieOption = configuration.CookieOptions;

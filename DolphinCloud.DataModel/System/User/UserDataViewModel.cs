@@ -29,12 +29,6 @@ namespace DolphinCloud.DataModel.System.User
         public DateTimeOffset CreateDateTime { get; set; }
 
         /// <summary>
-        /// 逻辑删除标志
-        /// </summary>
-        [JsonProperty]
-        public bool DeleteFG { get; set; } = false;
-
-        /// <summary>
         /// 邮箱地址
         /// </summary>
         [JsonProperty]

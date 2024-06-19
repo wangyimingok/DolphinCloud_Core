@@ -135,9 +135,9 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// <param name="UserName"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<JsonResult> EmailAddressIsExist(string UserName)
+        public async Task<JsonResult> EmailAddressIsExist(string emailAddress)
         {
-            var result = await _user.UserNameIsExistAsync(UserName);
+            var result = await _user.EMailAddressIsExistAsync(emailAddress);
             return Json(result);
         }
 
@@ -147,9 +147,21 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// <param name="UserName"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<JsonResult> MobilePhoneIsExist(string UserName)
+        public async Task<JsonResult> MobilePhoneIsExist(string mobilePhoneNumber)
         {
-            var result = await _user.UserNameIsExistAsync(UserName);
+            var result = await _user.MobilePhoneIsExistAsync(mobilePhoneNumber);
+            return Json(result);
+        }
+
+        /// <summary>
+        /// 逻辑删除用户
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<JsonResult> DeleteUser([FromBody] UserDataViewModel dataModel)
+        {
+            var result = await _user.DeleteUserAsync(dataModel);
             return Json(result);
         }
     }
