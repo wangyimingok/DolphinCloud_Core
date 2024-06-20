@@ -9,8 +9,16 @@ namespace DolphinCloud.Common.Constants
     /// <summary>
     /// 权限验证策略
     /// </summary>
-    internal class PermissionPolicy
+    public class PermissionPolicy
     {
-        public const string Admin = "Admin";
+        /// <summary>
+        /// 管理端权限
+        /// </summary>
+        public const string AdminArea = "Admin";
+
+        /// <summary>
+        /// 客户端权限
+        /// </summary>
+        public const string ClientArea = "Client";
     }
 }

@@ -9,7 +9,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
     /// 管理端主页
     /// </summary>
     [Area("Admin")]
-    [Authorize(Policy = Permissions.AdminArea)]
+    [Authorize(Policy = PermissionPolicy.AdminArea)]
     public class HomeController : BaseController
     {
         public IActionResult Index()

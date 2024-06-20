@@ -94,56 +94,24 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-//app.Use(async (context, next) =>
-//{
-//    var menuData = context.RequestServices.GetService<IMenuDataInterFace>(); //.Get<IMenuDataInterFace>();
-//    if (menuData != null)
-//    {
-//        var controllerList = Assembly.GetExecutingAssembly().GetTypes().Where(a=>a.BaseType==typeof(BaseController));
-//        await menuData.InitMenuData(controllerList);
-//    }
-//    var userData = context.RequestServices.GetService<IUserDataInterFace>();
-//    if (userData != null)
-//    {
-//        await userData.GenerateAdmin();
-//    }
-//    await next();
-//});
+
 app.UseRouting();
 //启用权限验证
 app.UseAuthentication();
 //身份验证
 app.UseAuthorization();
-
+//启用性能监测
 app.UseMiniProfiler();
-//app.UseSession();
-//app.MapControllerRoute(
-//    name: "default",
-//    pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
-    //endpoints.MapAreaControllerRoute(
-    //   name: "adminArea",
-    //   areaName: "Admin",
-    //   pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    
     endpoints.MapControllerRoute(
            name: "areas",
            pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
          );
 });
-
-//app.UseEndpoints(endpoints =>
-//{
-//    endpoints.MapControllerRoute(
-//      name: "areas",
-//      pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
-//    );
-//    endpoints.MapControllerRoute(
-//       name: "default",
-//       pattern: "{controller=Home}/{action=Index}/{id?}");
-//});
-
-app.Run();
+await app.RunAsync();

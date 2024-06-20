@@ -5,6 +5,7 @@ using DolphinCloud.Common.Constants;
 using DolphinCloud.DataInterFace.System;
 using DolphinCloud.Framework.Dependency;
 using DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers;
+using DolphinCloud.OMS.WebApplication.Initialization.CustomizeAuthen;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -93,11 +94,11 @@ namespace DolphinCloud.OMS.WebApplication.Initialization
         {
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Permissions.AdminArea, policy => policy.Requirements.Add(new AdminAreaRequirement("管理端")));
-                 options.AddPolicy(Permissions.ClientArea, policy => policy.Requirements.Add(new AdminAreaRequirement("客户端")));
+                options.AddPolicy(PermissionPolicy.AdminArea, policy => policy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.AdminArea)));
+                options.AddPolicy(PermissionPolicy.ClientArea, policy => policy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.ClientArea)));
                 //options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
             });
-            services.AddSingleton<IAuthorizationHandler, AdminAreaAccessHandler>();
+            services.AddSingleton<IAuthorizationHandler, CustomizeAuthorizationHandler>();
 
             if (configuration.CookieOptions.IsEnabledCookie)
             {

@@ -11,7 +11,7 @@ namespace DolphinCloud.OMS.WebApplication.Controllers
     /// <summary>
     /// Ê×Ò³
     /// </summary>
-    [Authorize(Policy = Permissions.ClientArea)]
+    [Authorize(Policy = PermissionPolicy.ClientArea)]
     public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
