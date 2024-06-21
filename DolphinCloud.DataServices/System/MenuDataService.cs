@@ -5,7 +5,9 @@ using DolphinCloud.Common.Pagination;
 using DolphinCloud.Common.Result;
 using DolphinCloud.DataEntity.System;
 using DolphinCloud.DataInterFace.System;
+using DolphinCloud.DataModel.Base;
 using DolphinCloud.DataModel.System.Menu;
+using DolphinCloud.Framework.Session;
 using DolphinCloud.Repository.System;
 using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Asn1.Cms;
@@ -36,21 +38,28 @@ namespace DolphinCloud.DataServices.System
         /// 菜单数据仓储
         /// </summary>
         private readonly MenuRepository _munuRepo;
-        public MenuDataService(ILogger<MenuDataService> logger, IMapper mapper, MenuRepository menuRepository)
+
+        private readonly ICurrentUserInfo _currentUser;
+        public MenuDataService(ILogger<MenuDataService> logger, IMapper mapper, MenuRepository menuRepository, ICurrentUserInfo currentUserInfo)
         {
             _logger = logger;
             _mapper = mapper;
             _munuRepo = menuRepository;
+            _currentUser = currentUserInfo;
         }
 
         public async Task<OperationMessage> CreateMenu(MenuCreateDataModel dataModel)
         {
             try
             {
+                if (await _munuRepo.Select.Where(a => a.MenuName == dataModel.MenuName).AnyAsync())
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, "菜单名称已存在,请更换一个名称后再试!");
+                }
                 var menuData = _mapper.Map<MenuCreateDataModel, MenuInfo>(dataModel);
-                menuData.CreateBy = "System";
+                menuData.CreateBy = string.IsNullOrWhiteSpace(_currentUser.UserName) ? "System" : _currentUser.UserName;
                 menuData.CreateDateTime = DateTimeOffset.Now;
-                menuData.LastModifyBy = "System";
+                menuData.LastModifyBy = string.IsNullOrWhiteSpace(_currentUser.UserName) ? "System" : _currentUser.UserName; ;
                 menuData.LastModifyDate = DateTimeOffset.Now;
                 //menuData.
                 await _munuRepo.InsertAsync(menuData);
@@ -60,6 +69,24 @@ namespace DolphinCloud.DataServices.System
             {
                 _logger.LogError(ex, $"创建菜单异常,异常原因为:【{ex.Message}】");
                 return new OperationMessage(Common.Enums.ResponseCode.ServerError, $"创建菜单异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 获得上级菜单下拉框选项
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResultMessage<List<OptionDataModel>>> GetMenuSelectOptionAsync()
+        {
+            try
+            {
+                var dataList = await _munuRepo.Select.Where(a => a.DeleteFG == false).ToListAsync(a => new OptionDataModel { OptionName = a.MenuName, OptionValue = a.MenuID.ToString() });
+                return new ResultMessage<List<OptionDataModel>>(ResponseCode.OperationSuccess, "获取上级菜单下拉框选项成功", dataList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"获取上级菜单下拉框选项异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<List<OptionDataModel>>(ResponseCode.ServerError, $"获取上级菜单下拉框选项异常,异常原因为:【{ex.Message}】", null);
             }
         }
 

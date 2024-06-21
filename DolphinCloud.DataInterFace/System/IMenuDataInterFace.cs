@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DolphinCloud.Common.Pagination;
 using DolphinCloud.Common.Result;
+using DolphinCloud.DataModel.Base;
 using DolphinCloud.DataModel.System.Menu;
 
 namespace DolphinCloud.DataInterFace.System
@@ -31,5 +32,11 @@ namespace DolphinCloud.DataInterFace.System
         Task<OperationMessage> CreateMenu(MenuCreateDataModel dataModel);
 
         Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTableAsync(MenuParameter pagination);
+
+        /// <summary>
+        /// 获得上级菜单下拉框选项
+        /// </summary>
+        /// <returns></returns>
+        Task<ResultMessage<List<OptionDataModel>>> GetMenuSelectOptionAsync();
     }
 }
