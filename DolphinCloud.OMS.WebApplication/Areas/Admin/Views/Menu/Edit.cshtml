@@ -4,7 +4,7 @@
         return Xsrf.GetAndStoreTokens(Context).RequestToken;
     }
 }
-@model DolphinCloud.DataModel.System.Menu.MenuCreateDataModel
+@model DolphinCloud.DataModel.System.Menu.MenuModifyDataModel
 <div class="layui-fluid">
     <div class="layui-card">
         <div class="layui-card-body" style="padding: 15px;">
@@ -62,7 +62,8 @@
                     </div>
                 </div>
                 <div class="layui-form-item layui-hide">
-                    <input type="button" lay-submit lay-filter="menuCreateSubmitFilter" id="btnMenuSubmit" value="确认">
+                    <input type="hidden" asp-for="MenuID" readonly />
+                    <input type="button" lay-submit lay-filter="menuModifySubmitFilter" id="btnMenuModifySubmit" value="确认">
                 </div>
             </form>
         </div>
@@ -97,17 +98,7 @@
             success: function (d) {
                 console.log(d);
             }
-        });
-        // 自定义验证规则
-        form.verify({
-            // 确认密码
-            confirmPassword: function (value, item) {
-                var passwordValue = $('#userPasswrod').val();
-                if (value !== passwordValue) {
-                    return '两次密码输入不一致';
-                }
-            }
-        });
+        });        
 
         $.ajax({
             url: "/Admin/Menu/GetMenuSelectOption",

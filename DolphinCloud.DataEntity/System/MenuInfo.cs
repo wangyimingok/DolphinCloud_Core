@@ -121,6 +121,11 @@ namespace DolphinCloud.DataEntity.System
         public virtual List<RoleAuthorityInfo> SystemRoleAuthorityInfos { get; set; }
 
         #endregion
+        /// <summary>
+        /// 子菜单数据
+        /// </summary>
+        [Navigate(nameof(ParentID))]
+        public virtual List<MenuInfo> ChildMenuData { get; set; }
     }
 
 }

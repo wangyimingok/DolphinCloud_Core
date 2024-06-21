@@ -8,10 +8,16 @@ using System.Threading.Tasks;
 namespace DolphinCloud.DataModel.System.Menu
 {
     /// <summary>
-    /// 菜单创建数据模型
+    /// 菜单编辑视图数据模型
     /// </summary>
-    public class MenuCreateDataModel
+    public class MenuModifyDataModel
     {
+        /// <summary>
+        /// 菜单主键
+        /// </summary>
+        [JsonProperty]
+        public int MenuID { get; set; }
+
         /// <summary>
         /// 操作名称
         /// </summary>
@@ -30,6 +36,12 @@ namespace DolphinCloud.DataModel.System.Menu
         [JsonProperty]
         public string ControllerName { get; set; }
 
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        [JsonProperty]
+        public string CreateBy { get; set; }
+        
         /// <summary>
         /// 图标
         /// </summary>
