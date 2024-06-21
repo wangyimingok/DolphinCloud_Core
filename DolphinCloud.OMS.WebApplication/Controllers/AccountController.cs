@@ -155,5 +155,21 @@ namespace DolphinCloud.OMS.WebApplication.Controllers
         {
             return await Task.FromResult(View());
         }
+
+        /// <summary>
+        /// 注销
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous, HttpGet]
+        public async Task<JsonResult> LoginOut()
+        {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+            var result = new OperationMessage(ResponseCode.LoginOut, "注销成功");
+            return Json(result);
+            //return RedirectToAction("Console", "Home");
+        }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using DolphinCloud.Common.Attributes;
+using DolphinCloud.Common.Constants;
 using DolphinCloud.Common.Enums;
 using DolphinCloud.Common.Pagination;
 using DolphinCloud.Common.Result;
 using DolphinCloud.DataInterFace.System;
 using DolphinCloud.DataModel.System.Menu;
 using DolphinCloud.OMS.WebApplication.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
@@ -13,6 +15,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
     /// 菜单控制器
     /// </summary>
     [Area("Admin")]
+    [Authorize(Policy = PermissionPolicy.AdminArea)]
     public class MenuController : BaseController
     {
         private readonly ILogger<MenuController> _logger;

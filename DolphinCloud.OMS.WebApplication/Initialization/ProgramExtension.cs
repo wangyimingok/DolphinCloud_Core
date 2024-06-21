@@ -94,6 +94,9 @@ namespace DolphinCloud.OMS.WebApplication.Initialization
         {
             services.AddAuthorization(options =>
             {
+                var DefaultPolicy = new AuthorizationPolicyBuilder();
+                DefaultPolicy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.ClientArea));
+                options.DefaultPolicy = DefaultPolicy.Build() ;
                 options.AddPolicy(PermissionPolicy.AdminArea, policy => policy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.AdminArea)));
                 options.AddPolicy(PermissionPolicy.ClientArea, policy => policy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.ClientArea)));
                 //options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));

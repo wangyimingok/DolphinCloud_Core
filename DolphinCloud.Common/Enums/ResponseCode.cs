@@ -27,5 +27,10 @@ namespace DolphinCloud.Common.Enums
         /// </summary>
         [Description("服务器异常")]
         ServerError = 500,
+        /// <summary>
+        /// 注销登陆
+        /// </summary>
+        [Description("注销登陆")]
+        LoginOut =1001
     }
 }

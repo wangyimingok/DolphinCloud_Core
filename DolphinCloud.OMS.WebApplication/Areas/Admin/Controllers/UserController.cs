@@ -1,9 +1,11 @@
 ﻿using DolphinCloud.Common.Attributes;
+using DolphinCloud.Common.Constants;
 using DolphinCloud.Common.Enums;
 using DolphinCloud.Common.Result;
 using DolphinCloud.DataInterFace.System;
 using DolphinCloud.DataModel.System.User;
 using DolphinCloud.OMS.WebApplication.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
@@ -12,6 +14,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
     /// 用户信息控制器
     /// </summary>
     [Area("Admin")]
+    [Authorize(Policy = PermissionPolicy.AdminArea)]
     public class UserController : BaseController
     {
         private readonly IUserDataInterFace _user;
