@@ -227,9 +227,14 @@ namespace DolphinCloud.DataServices.System
                 long totalDataCount = 0;
                 var MenuList = await _userRepo.Select
                     .Page(pagination.PageIndex, pagination.PageSize)
-                    .Count(out totalDataCount)
-                    .WhereIf(!string.IsNullOrWhiteSpace(pagination.UserName), a => a.UserName.Contains(pagination.UserName))
+                    .WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.UserName.Contains(pagination.SearchKey)
+                        || a.MobileNumber.Contains(pagination.SearchKey) || a.EMailAddress.Contains(pagination.SearchKey)
+                        || a.RealName.Contains(pagination.SearchKey))
+                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.MobileNumber.Contains(pagination.SearchKey))
+                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.EMailAddress.Contains(pagination.SearchKey))
+                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.RealName.Contains(pagination.SearchKey))
                     .Where(a => a.DeleteFG == false)
+                    .Count(out totalDataCount)
                     .ToListAsync(cancellationToken);
                 var DataModel = _mapper.Map<List<UserInfo>, List<UserDataViewModel>>(MenuList);
                 return new PaginationResult<List<UserDataViewModel>>(ResponseCode.OperationSuccess, "查询成功", totalDataCount, DataModel);

@@ -11,7 +11,7 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">菜单列表</div>
+                <div class="layui-card-header">用户列表</div>
                 <div class="layui-card-body">
                     <table class="layui-hide" id="userTable" lay-filter="userTable"></table>
                     <script type="text/html" id="userBar">
@@ -19,8 +19,8 @@
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
                     <script type="text/html" id="userToolbar">
-                         <div class="layui-inline">
-                           <input class="layui-input" id="UserName" autocomplete="off"  placeholder="用户名">
+                         <div class="layui-inline" style="width:260px" >
+                           <input class="layui-input" id="UserName" autocomplete="off" placeholder="用户名|手机号|真实姓名|邮箱地址">
                         </div>
                         <button class="layui-btn" lay-event="search">搜索</button>
                         <button class="layui-btn" lay-event="createUser">创建新用户</button>
@@ -61,7 +61,17 @@
                 { field: 'realName', title: '真实姓名', sort: true, align: 'right' },
                 { field: 'mobileNumber', title: '手机号码', sort: true, align: 'right' },
                 { field: 'eMailAddress', title: '邮箱地址', sort: true, align: 'right' },
-                { field: 'status', title: '状态', sort: true, align: 'right' },
+                {
+                    field: 'status', title: '状态', sort: true, align: 'right', templet: function (d) {
+                        if (d.status == '0') {
+                            return '<span style="color: #000000;">未知</span>';
+                        } else if (d.status == '1') {
+                            return '<span style="color: #00FF00;">正常</span>';
+                        } else if (d.status == '2') {
+                            return '<span style="color: #FF0000;">禁用</span>';
+                        }
+                    }
+                },
                 { field: 'createBy', title: '创建人', sort: true, align: 'right' },
                 { field: 'createDateTime', title: '创建时间', sort: true, align: 'right' },
                 { field: 'lastModifyBy', title: '最后修改人', sort: true, align: 'right' },
@@ -142,7 +152,7 @@
             var id = obj.config.id;
             var checkStatus = table.checkStatus(id);
             var othis = lay(this);
-            var userName = $(UserName).val();
+            var searchKey = $(UserName).val();
             switch (obj.event) {
                 case 'createUser':
                     layer.open({
@@ -162,14 +172,14 @@
                     //执行重载
                     table.reload('userTable', {
                         page: {
-                            curr: 1, //重新从第 1 页开始 
+                            curr: 1, //重新从第 1 页开始
                         }
                         , where: {
-                            userName
+                            searchKey
                         }
                     });
                     //对搜索框重新赋值
-                    $(UserName).val(userName);
+                    $(UserName).val(searchKey);
                     break;
             };
         });
@@ -194,5 +204,5 @@
         });
     });
 
-
+   
 </script>

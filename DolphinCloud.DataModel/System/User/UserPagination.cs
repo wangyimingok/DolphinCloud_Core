@@ -16,7 +16,7 @@ namespace DolphinCloud.DataModel.System.User
         /// <summary>
         /// 用户名
         /// </summary>
-        [JsonProperty("userName")]
-        public string UserName { get; set; }
+        [JsonProperty("searchKey")]
+        public string SearchKey { get; set; }
     }
 }
