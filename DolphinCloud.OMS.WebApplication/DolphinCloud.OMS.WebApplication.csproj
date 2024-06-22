@@ -37,5 +37,10 @@
 		<ProjectReference Include="..\DolphinCloud.Framework\DolphinCloud.Framework.csproj" />
 		<ProjectReference Include="..\DolphinCloud.Repository\DolphinCloud.Repository.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Certificates\localhost.pfx">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 
 </Project>

@@ -170,19 +170,15 @@ namespace DolphinCloud.OMS.WebApplication.Initialization
 
         }
 
-        //internal static void InitSystemData(this WebApplicationBuilder services)
-        //{
-        //    services.Services.BuildServiceProvider();
-        //    services.Services.GetService<IMenuDataInterFace>();
-        //     var menuData = IocManager.Instance.Resolve<IMenuDataInterFace>();
-        //    if (menuData != null)
-        //    {
-        //        var controllerList=  Assembly.GetExecutingAssembly().GetTypes().Where(a => !a.IsInterface && a.IsAssignableFrom(typeof(BaseController)));
-        //        foreach (var item in controllerList)
-        //        {
-        //            //item.GetMethods().Where(a=>a.Attributes.)
-        //        }
-        //    }
-        //}
+        /// <summary>
+        /// 配置Kestrel https
+        /// </summary>
+        /// <param name="webBuilder"></param>
+        /// <param name="configuration"></param>
+        internal static void ConfigureKestrelHttps(this WebApplicationBuilder webBuilder, IConfiguration configuration)
+        {
+            webBuilder.WebHost.UseConfiguration(configuration)
+                .UseKestrel();
+        }
     }
 }

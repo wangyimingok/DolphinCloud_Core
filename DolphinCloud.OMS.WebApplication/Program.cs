@@ -85,6 +85,7 @@ builder.Services.AddFreeSQLORM(RootConfig);
 IocManager.Instance.AddConventionalRegistrar(new DolphinCloudOMSRegistrar());
 IocManager.Instance.RegisterAssemblyByConvention(typeof(DolphinCloudOMSRegistrar).Assembly);
 //builder.Services.InitSystemData();
+builder.ConfigureKestrelHttps(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
