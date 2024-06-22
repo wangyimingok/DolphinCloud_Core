@@ -51,7 +51,7 @@
         },
         cols: [[
             { field: 'menuID', title: '主键', width: 80, sort: true },
-            { field: 'parentID', title: '上级菜单主键', sort: true, align: 'center' },
+            { field: 'parentID', title: '上级菜单主键', sort: true, align: 'center', hide: true },
             { field: 'menuName', title: '菜单名称', sort: true, align: 'center' },
             {
                 field: 'menuType', title: '菜单类型', sort: true, align: 'center', templet: function (d) {
@@ -59,7 +59,7 @@
                         return '模块';
                     } else if (d.menuType == '2') {
                         return '菜单';
-                    } else { 
+                    } else {
                         return '按钮/功能';
                     }
                 }
@@ -74,7 +74,7 @@
             { field: 'createDateTime', title: '创建时间', sort: true, align: 'center' },
             { field: 'lastModifyBy', title: '最后修改人', sort: true, align: 'center' },
             { field: 'lastModifyDate', title: '最后修改时间', sort: true, align: 'center' },
-            { fixed: 'right', title: '操作', sort: true, align: 'center', toolbar: '#menuBar' }
+            { fixed: 'center', title: '操作', sort: true, toolbar: '#menuBar' }
         ]],
         response: {
             statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0

@@ -63,7 +63,7 @@ builder.Services.AddControllersWithViews(option =>
 });
 //Ìí¼ÓAutoMaperÓ³Éä¹ØÏµÅäÖÃ
 builder.Services.AddAutoMapperConfigrtion();
-//builder.Services.ConfigCustomerDataProtectionForRedisAndSessionCookie(RootConfig);
+builder.Services.ConfigCustomerDataProtectionForRedisAndSessionCookie(RootConfig);
 //·ÀCSRF×¢Èë¹¥»÷ÅäÖÃ
 builder.Services.AddAntiforgery(options =>
 {
