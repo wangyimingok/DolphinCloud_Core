@@ -72,24 +72,6 @@
                 return '两次密码输入不一致';
             }
         }
-        // userNameIsExist: function (value, item) {
-        //     var userName = $("#userName").val();
-        //     $.ajax({
-        //         url: "/Admin/User/UserNameIsExist?UserName=" + userName,
-        //         type: 'Get',               
-        //         success: function (data) {
-        //             console.log(data);
-        //             if (data.responseCode != 200) {                        
-        //                 return data.message;
-        //             }                    
-        //         },
-        //         error: function (data) {
-        //             alert(data);
-        //             console.log(data);
-        //         }
-        //     });
-        //     //alert(userName);
-        // }
     });
 
     form.on('submit(userCreate-submit)', function (data) {
