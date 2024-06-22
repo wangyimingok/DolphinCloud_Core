@@ -19,7 +19,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">邮箱</label>
                     <div class="layui-input-block">
-                        <input type="email" asp-for="EMailAddress" lay-verify="required" autocomplete="off" placeholder="请输入邮箱地址" class="layui-input">
+                        <input type="email" asp-for="EMailAddress" lay-verify="required|email" autocomplete="off" placeholder="请输入邮箱地址" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -31,7 +31,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">手机号码</label>
                     <div class="layui-input-block">
-                        <input type="tel" asp-for="MobileNumber" lay-verify="required" autocomplete="off" placeholder="手机号码" class="layui-input">
+                        <input type="tel" asp-for="MobileNumber" lay-verify="required|phone" autocomplete="off" placeholder="手机号码" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-form-item">

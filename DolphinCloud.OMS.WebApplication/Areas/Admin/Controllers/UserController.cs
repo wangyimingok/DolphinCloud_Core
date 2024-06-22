@@ -1,4 +1,5 @@
-﻿using DolphinCloud.Common.Attributes;
+﻿using Castle.Facilities.TypedFactory;
+using DolphinCloud.Common.Attributes;
 using DolphinCloud.Common.Constants;
 using DolphinCloud.Common.Enums;
 using DolphinCloud.Common.Result;
@@ -85,7 +86,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<PaginationResult<List<UserDataViewModel>>> GetUserPaginationDataList(UserPagination pagination, CancellationToken cancellationToken)
+        public async Task<PaginationResult<List<UserDataViewModel>>> GetUserPaginationDataList([FromBody] UserPagination pagination, CancellationToken cancellationToken)
         {
             var result = await _user.GetUserPaginationDataListAsync(pagination, cancellationToken);
             return result;

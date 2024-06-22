@@ -107,7 +107,7 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var CurrentDataEntity = await _userRepo.Select.Where(a => a.UserID == dataModel.UserID&&a.UserName==dataModel.UserName&&a.EMailAddress==dataModel.EMailAddress&&a.MobileNumber==dataModel.MobileNumber).ToUpdate().Set(a=>a.DeleteFG,true).Set(a=>a.LastModifyBy,_currentUser.UserName).Set(a=>a.LastModifyDate, DateTimeOffset.Now).ExecuteAffrowsAsync();
+                var CurrentDataEntity = await _userRepo.Select.Where(a => a.UserID == dataModel.UserID && a.UserName == dataModel.UserName && a.EMailAddress == dataModel.EMailAddress && a.MobileNumber == dataModel.MobileNumber).ToUpdate().Set(a => a.DeleteFG, true).Set(a => a.LastModifyBy, _currentUser.UserName).Set(a => a.LastModifyDate, DateTimeOffset.Now).ExecuteAffrowsAsync();
                 if (CurrentDataEntity > 0)
                 {
                     return new OperationMessage(ResponseCode.OperationSuccess, "删除用户成功");
@@ -227,8 +227,14 @@ namespace DolphinCloud.DataServices.System
                 long totalDataCount = 0;
                 var MenuList = await _userRepo.Select
                     .Page(pagination.PageIndex, pagination.PageSize)
-                    .Count(out totalDataCount)
+                    .WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.UserName.Contains(pagination.SearchKey)
+                        || a.MobileNumber.Contains(pagination.SearchKey) || a.EMailAddress.Contains(pagination.SearchKey)
+                        || a.RealName.Contains(pagination.SearchKey))
+                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.MobileNumber.Contains(pagination.SearchKey))
+                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.EMailAddress.Contains(pagination.SearchKey))
+                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.RealName.Contains(pagination.SearchKey))
                     .Where(a => a.DeleteFG == false)
+                    .Count(out totalDataCount)
                     .ToListAsync(cancellationToken);
                 var DataModel = _mapper.Map<List<UserInfo>, List<UserDataViewModel>>(MenuList);
                 return new PaginationResult<List<UserDataViewModel>>(ResponseCode.OperationSuccess, "查询成功", totalDataCount, DataModel);
