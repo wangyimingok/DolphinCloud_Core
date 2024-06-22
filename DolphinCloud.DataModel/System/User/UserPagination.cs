@@ -1,4 +1,5 @@
 ﻿using DolphinCloud.Common.Pagination;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,10 @@ namespace DolphinCloud.DataModel.System.User
     /// </summary>
     public class UserPagination: BasePagination
     {
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        [JsonProperty("userName")]
+        public string UserName { get; set; }
     }
 }

@@ -107,7 +107,7 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var CurrentDataEntity = await _userRepo.Select.Where(a => a.UserID == dataModel.UserID&&a.UserName==dataModel.UserName&&a.EMailAddress==dataModel.EMailAddress&&a.MobileNumber==dataModel.MobileNumber).ToUpdate().Set(a=>a.DeleteFG,true).Set(a=>a.LastModifyBy,_currentUser.UserName).Set(a=>a.LastModifyDate, DateTimeOffset.Now).ExecuteAffrowsAsync();
+                var CurrentDataEntity = await _userRepo.Select.Where(a => a.UserID == dataModel.UserID && a.UserName == dataModel.UserName && a.EMailAddress == dataModel.EMailAddress && a.MobileNumber == dataModel.MobileNumber).ToUpdate().Set(a => a.DeleteFG, true).Set(a => a.LastModifyBy, _currentUser.UserName).Set(a => a.LastModifyDate, DateTimeOffset.Now).ExecuteAffrowsAsync();
                 if (CurrentDataEntity > 0)
                 {
                     return new OperationMessage(ResponseCode.OperationSuccess, "删除用户成功");
@@ -228,6 +228,7 @@ namespace DolphinCloud.DataServices.System
                 var MenuList = await _userRepo.Select
                     .Page(pagination.PageIndex, pagination.PageSize)
                     .Count(out totalDataCount)
+                    .WhereIf(!string.IsNullOrWhiteSpace(pagination.UserName), a => a.UserName.Contains(pagination.UserName))
                     .Where(a => a.DeleteFG == false)
                     .ToListAsync(cancellationToken);
                 var DataModel = _mapper.Map<List<UserInfo>, List<UserDataViewModel>>(MenuList);

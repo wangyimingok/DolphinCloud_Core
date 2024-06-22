@@ -19,9 +19,12 @@
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
                     <script type="text/html" id="userToolbar">
-                        <div class="layui-btn-container">
-                          <button class="layui-btn layui-btn-sm" lay-event="createUser">创建新用户</button>
+                         <div class="layui-inline">
+                           <input class="layui-input" id="UserName" autocomplete="off"  placeholder="用户名">
                         </div>
+                        <button class="layui-btn" lay-event="search">搜索</button>
+                        <button class="layui-btn" lay-event="createUser">创建新用户</button>
+
                     </script>
                 </div>
             </div>
@@ -62,9 +65,10 @@
                 { field: 'createBy', title: '创建人', sort: true, align: 'right' },
                 { field: 'createDateTime', title: '创建时间', sort: true, align: 'right' },
                 { field: 'lastModifyBy', title: '最后修改人', sort: true, align: 'right' },
-                { field: 'lastModifyDate', title: '最后修改时间', sort: true, align: 'right' },                
+                { field: 'lastModifyDate', title: '最后修改时间', sort: true, align: 'right' },
                 { fixed: 'right', title: '操作', width: 125, minWidth: 125, toolbar: '#userBar' }
             ]],
+            id: 'userTable',
             response: {
                 statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
             },
@@ -130,7 +134,7 @@
                         table.reload('userTable');
                     }
                 });
-               
+
             }
         });
         // 工具栏事件
@@ -138,6 +142,7 @@
             var id = obj.config.id;
             var checkStatus = table.checkStatus(id);
             var othis = lay(this);
+            var userName = $(UserName).val();
             switch (obj.event) {
                 case 'createUser':
                     layer.open({
@@ -153,6 +158,18 @@
                             table.reload('userTable');
                         }
                     });
+                case 'search':
+                    //执行重载
+                    table.reload('userTable', {
+                        page: {
+                            curr: 1, //重新从第 1 页开始 
+                        }
+                        , where: {
+                            userName
+                        }
+                    });
+                    //对搜索框重新赋值
+                    $(UserName).val(userName);
                     break;
             };
         });

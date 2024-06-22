@@ -120,7 +120,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// <param name="pagination"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTable(MenuParameter pagination)
+        public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTable([FromBody]MenuParameter pagination)
         {
             var result = await _menuData.GetMenuTableAsync(pagination);
             return result;
