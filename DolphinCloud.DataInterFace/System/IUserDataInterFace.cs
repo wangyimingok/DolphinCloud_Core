@@ -82,5 +82,36 @@ namespace DolphinCloud.DataInterFace.System
         /// <param name="dataModel"></param>
         /// <returns></returns>
         Task<OperationMessage> DeleteUserAsync(UserDataViewModel dataModel);
+
+
+        /// <summary>
+        /// 重置密码
+        /// </summary>
+        /// <param name="resetPassword"></param>
+        /// <returns></returns>
+        Task<OperationMessage> ResetPasswordAsync(ResetPasswordDataModel resetPassword);
+
+        /// <summary>
+        /// 根据用户数据主键获得用户可修改的数据字段
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        Task<ResultMessage<ResetPasswordDataModel>> GetResetPasswordDataModelAsync(long UserID);
+
+        /// <summary>
+        /// 根据用户数据主键获得用户基本信息数据模型
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        Task<ResultMessage<BasicInfoDataModel>> GetBasicInfoDataModelAsync(long UserID);
+
+        /// <summary>
+        /// 更新用户基本信息
+        /// 异步方法
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        Task<OperationMessage> UpdateUserBasicInfoDataAsync(BasicInfoDataModel dataModel);
+
     }
 }

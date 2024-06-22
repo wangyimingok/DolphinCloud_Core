@@ -6,18 +6,10 @@ using DolphinCloud.Common.Snowflake;
 using DolphinCloud.DataEntity.System;
 using DolphinCloud.DataInterFace.System;
 using DolphinCloud.DataModel.Account;
-using DolphinCloud.DataModel.System.Menu;
 using DolphinCloud.DataModel.System.User;
 using DolphinCloud.Framework.Session;
 using DolphinCloud.Repository.System;
-using FreeScheduler;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DolphinCloud.DataServices.System
 {
@@ -230,9 +222,6 @@ namespace DolphinCloud.DataServices.System
                     .WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.UserName.Contains(pagination.SearchKey)
                         || a.MobileNumber.Contains(pagination.SearchKey) || a.EMailAddress.Contains(pagination.SearchKey)
                         || a.RealName.Contains(pagination.SearchKey))
-                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.MobileNumber.Contains(pagination.SearchKey))
-                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.EMailAddress.Contains(pagination.SearchKey))
-                    //.WhereIf(!string.IsNullOrWhiteSpace(pagination.SearchKey), a => a.RealName.Contains(pagination.SearchKey))
                     .Where(a => a.DeleteFG == false)
                     .Count(out totalDataCount)
                     .ToListAsync(cancellationToken);
@@ -364,6 +353,110 @@ namespace DolphinCloud.DataServices.System
             {
                 _logger.LogError(ex, $"登陆验证出现异常,异常原因为:【{ex.Message}】");
                 return new ResultMessage<LoginViewModel>(ResponseCode.ServerError, $"登陆验证出现异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="resetPassword"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> ResetPasswordAsync(ResetPasswordDataModel resetPassword)
+        {
+            try
+            {
+                var oldPassword= SecurityUtil.MD5_HexConvert(SecurityUtil.Base64Encode(resetPassword.OldPassWord));
+                if (!await _userRepo.Where(a=>a.UserID==resetPassword.UserID&&a.PassWord== oldPassword).AnyAsync())
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, "原密码错误");
+                }
+                var newPassWord = SecurityUtil.MD5_HexConvert(SecurityUtil.Base64Encode(resetPassword.NewPassWord));
+                var result = await _userRepo.UpdateDiy.Set(a => a.PassWord, newPassWord).Set(a => a.LastModifyBy, _currentUser.UserName).Set(a => a.LastModifyDate, DateTimeOffset.Now).Where(a => a.UserID == resetPassword.UserID).ExecuteAffrowsAsync();
+                return new OperationMessage(ResponseCode.OperationSuccess, "密码修改成功");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,$"修改密码操作异常,异常原因为:【{ex.Message}】");
+               return new OperationMessage(ResponseCode.ServerError, $"修改密码失败");
+            }
+        }
+
+        /// <summary>
+        /// 根据用户ID获得用户修改密码数据模型
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        public async Task<ResultMessage<ResetPasswordDataModel>> GetResetPasswordDataModelAsync(long UserID)
+        {
+            try
+            {
+                var dataModel=await _userRepo.Select.Where(a => a.UserID == UserID).ToOneAsync(a=>new ResetPasswordDataModel { UserID=a.UserID, UserName=a.UserName });
+                return new ResultMessage<ResetPasswordDataModel>(ResponseCode.OperationSuccess, "查询成功", dataModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,$"根据用户ID获得用户修改密码数据模型异常,异常原因为:【{ex.Message}】");
+               return new ResultMessage<ResetPasswordDataModel>(ResponseCode.ServerError, $"根据用户ID获得用户修改密码数据模型异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 根据用户数据主键获得用户基本信息数据模型
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        public async Task<ResultMessage<BasicInfoDataModel>> GetBasicInfoDataModelAsync(long UserID)
+        {
+            try
+            {
+                if (UserID > 0)
+                {
+                    var DataEntity = await _userRepo.Select.Where(a => a.UserID == UserID).ToOneAsync();
+                    if (DataEntity != null)
+                    {
+                        var DataModel = _mapper.Map<UserInfo, BasicInfoDataModel>(DataEntity);
+                        return new ResultMessage<BasicInfoDataModel>(ResponseCode.OperationSuccess, "查询成功", DataModel);
+                    }
+                }
+                return new ResultMessage<BasicInfoDataModel>(ResponseCode.OperationWarning, "未查询到符合条件的用户信息数据");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"根据用户数据主键获得用户基本信息数据模型查询异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<BasicInfoDataModel>(ResponseCode.ServerError, $"根据用户数据主键获得用户基本信息数据模型查询异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 更新用户基本信息
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> UpdateUserBasicInfoDataAsync(BasicInfoDataModel dataModel)
+        {
+            try
+            {
+                var CurrentDataEntity = await _userRepo.Select.Where(a => a.UserID == dataModel.UserID).ToOneAsync();
+                if (CurrentDataEntity != null)
+                {
+                    var result = await _userRepo.UpdateDiy.SetIf(dataModel.UserName != CurrentDataEntity.UserName, a => a.UserName, dataModel.UserName)
+                          .SetIf(dataModel.MobileNumber != CurrentDataEntity.MobileNumber, a => a.MobileNumber, dataModel.MobileNumber)
+                          .SetIf(dataModel.EMailAddress != CurrentDataEntity.EMailAddress, a => a.EMailAddress, dataModel.EMailAddress)
+                          .SetIf(dataModel.RealName != CurrentDataEntity.RealName, a => a.RealName, dataModel.RealName)
+                          .Set(a => a.LastModifyBy, _currentUser.UserName)
+                          .Set(a => a.LastModifyDate, DateTimeOffset.Now)
+                          .Where(a => a.UserID == dataModel.UserID).ExecuteAffrowsAsync();
+                    return new OperationMessage(ResponseCode.OperationSuccess, "用户基本信息更新成功");
+                }
+                else
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, "未查询到符合条件的用户信息数据,更新失败");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"更新用户基本信息异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"更新用户基本信息异常,异常原因为:【{ex.Message}】");
             }
         }
     }

@@ -25,7 +25,8 @@ namespace DolphinCloud.AutoMapper
                 cfg.AddProfile<MenuMapperProfile>();
                 //用户信息配置映射
                 cfg.AddProfile<UserMapperProfile>();
-                
+                //角色信息配置映射
+                cfg.AddProfile<RoleMapperProfile>();
             });
         }
     }

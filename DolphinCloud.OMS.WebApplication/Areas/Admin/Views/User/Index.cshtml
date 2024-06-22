@@ -91,8 +91,6 @@
 
         //触发单元格工具事件
         table.on('tool(userTable)', function (obj) { // 双击 toolDouble
-            var data = obj.data;
-            console.log(obj)
             if (obj.event === 'del') {
                 layer.confirm('真的删除行么', {
                     btn: ['确定', '关闭'] //按钮
@@ -102,7 +100,7 @@
                         url: "/Admin/User/DeleteUser",
                         type: 'POST',
                         dataType: "JSON",
-                        data: JSON.stringify(data),
+                        data: JSON.stringify(obj.data),
                         contentType: "application/json;charset=utf-8",
                         headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
                         success: function (data) {

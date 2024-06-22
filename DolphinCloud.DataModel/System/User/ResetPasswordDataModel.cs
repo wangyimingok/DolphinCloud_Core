@@ -8,39 +8,32 @@ using System.Threading.Tasks;
 namespace DolphinCloud.DataModel.System.User
 {
     /// <summary>
-    /// 用户创建数据模型
+    /// 重置密码数据模型
     /// </summary>
-    public class UserCreateDataModel
+    public class ResetPasswordDataModel
     {
         /// <summary>
-        /// 真实姓名
+        /// 用户信息主键
         /// </summary>
         [JsonProperty]
-        public string RealName { get; set; }
+        public long UserID { get; set; }
 
         /// <summary>
         /// 用户名称
         /// </summary>
         [JsonProperty]
         public string UserName { get; set; }
-        /// <summary>
-        /// 邮箱地址
-        /// </summary>
-        [JsonProperty]
-        public string EMailAddress { get; set; }
 
         /// <summary>
-        /// 手机号码
+        /// 旧密码
         /// </summary>
         [JsonProperty]
-        public string MobileNumber { get; set; }
+        public string OldPassWord { get; set; }
 
         /// <summary>
-        /// 密码
+        /// 新密码
         /// </summary>
         [JsonProperty]
-        public string PassWord { get; set; }
-
-
+        public string NewPassWord { get; set; }
     }
 }

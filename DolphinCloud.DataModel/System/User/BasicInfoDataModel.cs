@@ -8,39 +8,38 @@ using System.Threading.Tasks;
 namespace DolphinCloud.DataModel.System.User
 {
     /// <summary>
-    /// 用户创建数据模型
+    /// 用户基本信息数据模型
     /// </summary>
-    public class UserCreateDataModel
+    public class BasicInfoDataModel
     {
         /// <summary>
-        /// 真实姓名
+        /// 用户信息主键
         /// </summary>
-        [JsonProperty]
-        public string RealName { get; set; }
+        [JsonProperty("UserID")]
+        public long UserID { get; set; }
 
-        /// <summary>
-        /// 用户名称
-        /// </summary>
-        [JsonProperty]
-        public string UserName { get; set; }
         /// <summary>
         /// 邮箱地址
         /// </summary>
-        [JsonProperty]
+        [JsonProperty("EMailAddress")]
         public string EMailAddress { get; set; }
 
         /// <summary>
         /// 手机号码
         /// </summary>
-        [JsonProperty]
+        [JsonProperty("MobileNumber")]
         public string MobileNumber { get; set; }
 
         /// <summary>
-        /// 密码
+        /// 真实姓名
         /// </summary>
-        [JsonProperty]
-        public string PassWord { get; set; }
+        [JsonProperty("RealName")]
+        public string RealName { get; set; }
 
-
+        /// <summary>
+        /// 用户名称
+        /// </summary>
+        [JsonProperty("UserName")]
+        public string UserName { get; set; }
     }
 }

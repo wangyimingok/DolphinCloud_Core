@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace DolphinCloud.DataModel.System.User
 {
+    /// <summary>
+    /// 用户信息更新数据模型
+    /// </summary>
     public class UserModifyDataModel
     {
         /// <summary>
@@ -30,7 +33,7 @@ namespace DolphinCloud.DataModel.System.User
         /// <summary>
         /// 密码
         /// </summary>
-        [JsonProperty]
+        [JsonProperty("PassWord")]
         public string PassWord { get; set; }
 
         /// <summary>

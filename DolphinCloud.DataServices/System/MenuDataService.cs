@@ -60,12 +60,12 @@ namespace DolphinCloud.DataServices.System
                 menuData.LastModifyDate = DateTimeOffset.Now;
                 //menuData.
                 await _munuRepo.InsertAsync(menuData);
-                return new OperationMessage(Common.Enums.ResponseCode.OperationSuccess, "增加菜单成功");
+                return new OperationMessage(ResponseCode.OperationSuccess, "增加菜单成功");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"创建菜单异常,异常原因为:【{ex.Message}】");
-                return new OperationMessage(Common.Enums.ResponseCode.ServerError, $"创建菜单异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"创建菜单异常,异常原因为:【{ex.Message}】");
             }
         }
 
@@ -125,7 +125,7 @@ namespace DolphinCloud.DataServices.System
                 long totalDataCount = 0;
                 var MenuList = await _munuRepo.Select
                     .Page(pagination.PageIndex, pagination.PageSize)
-                     .Where(a => a.DeleteFG == false)
+                    .Where(a => a.DeleteFG == false)
                     .Count(out totalDataCount)                   
                     .ToListAsync();
                 var DataModel = _mapper.Map<List<MenuInfo>, List<MenuDataViewModel>>(MenuList);

@@ -5,6 +5,7 @@ using DolphinCloud.Common.Enums;
 using DolphinCloud.Common.Result;
 using DolphinCloud.DataInterFace.System;
 using DolphinCloud.DataModel.System.User;
+using DolphinCloud.Framework.Session;
 using DolphinCloud.OMS.WebApplication.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +19,18 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
     [Authorize(Policy = PermissionPolicy.AdminArea)]
     public class UserController : BaseController
     {
+        /// <summary>
+        /// 用户数据接口
+        /// </summary>
         private readonly IUserDataInterFace _user;
-        public UserController(IUserDataInterFace userDataInterFace)
+        /// <summary>
+        /// 当前用户信息
+        /// </summary>
+        private readonly ICurrentUserInfo _currentUser;
+        public UserController(IUserDataInterFace userDataInterFace, ICurrentUserInfo currentUserInfo)
         {
             _user = userDataInterFace;
+            _currentUser= currentUserInfo;
         }
         /// <summary>
         /// 用户信息首页
@@ -76,7 +85,6 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
                 var result = new OperationMessage(ResponseCode.OperationWarning, "参数错误");
                 return new JsonResult(result);
             }
-
         }
 
         /// <summary>
@@ -166,6 +174,55 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         public async Task<JsonResult> DeleteUser([FromBody] UserDataViewModel dataModel)
         {
             var result = await _user.DeleteUserAsync(dataModel);
+            return Json(result);
+        }
+
+        /// <summary>
+        /// 修改密码页面视图
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IActionResult> ResetPassword()
+        {
+            var result = await _user.GetResetPasswordDataModelAsync(_currentUser.UserID);
+            if (result.Code == ResponseCode.OperationSuccess)
+            {
+                var UserDataModel = result.Data;
+                return View(UserDataModel);
+            }
+            return View();
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<JsonResult> ResetPassword([FromBody] ResetPasswordDataModel dataModel)
+        {
+            var result = await _user.ResetPasswordAsync(dataModel);
+            return Json(result);
+        }
+
+        /// <summary>
+        /// 用户基本信息页面视图
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IActionResult> BasicInfo()
+        {
+            var result = await _user.GetBasicInfoDataModelAsync(_currentUser.UserID);
+            if (result.Code == ResponseCode.OperationSuccess)
+            {
+                var UserDataModel = result.Data;
+                return View(UserDataModel);
+            }
+            return View();
+        }
+
+        /// <summary>
+        /// 更新用户基本信息
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<JsonResult> UpdateBasicInfo([FromBody] BasicInfoDataModel dataModel)
+        {
+            var result = await _user.UpdateUserBasicInfoDataAsync(dataModel);
             return Json(result);
         }
     }
