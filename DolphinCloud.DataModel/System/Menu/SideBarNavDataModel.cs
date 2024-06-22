@@ -8,10 +8,16 @@ using System.Threading.Tasks;
 namespace DolphinCloud.DataModel.System.Menu
 {
     /// <summary>
-    /// 菜单创建数据模型
+    /// 导航栏数据模型
     /// </summary>
-    public class MenuCreateDataModel
+    public class SideBarNavDataModel
     {
+        /// <summary>
+        /// 菜单主键
+        /// </summary>
+        [JsonProperty]
+        public int MenuID { get; set; }
+
         /// <summary>
         /// 操作名称
         /// </summary>
@@ -29,7 +35,7 @@ namespace DolphinCloud.DataModel.System.Menu
         /// </summary>
         [JsonProperty]
         public string ControllerName { get; set; }
-
+       
         /// <summary>
         /// 图标
         /// </summary>
@@ -65,5 +71,10 @@ namespace DolphinCloud.DataModel.System.Menu
         /// </summary>
         [JsonProperty]
         public short SortNumber { get; set; }
+
+        /// <summary>
+        /// 子菜单数据
+        /// </summary>
+        public List<SideBarNavDataModel> childMenuData { get; set; }
     }
 }

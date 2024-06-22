@@ -1,21 +1,15 @@
 ﻿using AutoMapper;
 using DolphinCloud.Common.Attributes;
 using DolphinCloud.Common.Enums;
-using DolphinCloud.Common.Pagination;
 using DolphinCloud.Common.Result;
 using DolphinCloud.DataEntity.System;
 using DolphinCloud.DataInterFace.System;
+using DolphinCloud.DataModel.Base;
 using DolphinCloud.DataModel.System.Menu;
+using DolphinCloud.Framework.Session;
 using DolphinCloud.Repository.System;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Asn1.Cms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DolphinCloud.DataServices.System
 {
@@ -36,21 +30,33 @@ namespace DolphinCloud.DataServices.System
         /// 菜单数据仓储
         /// </summary>
         private readonly MenuRepository _munuRepo;
-        public MenuDataService(ILogger<MenuDataService> logger, IMapper mapper, MenuRepository menuRepository)
+
+        private readonly ICurrentUserInfo _currentUser;
+        public MenuDataService(ILogger<MenuDataService> logger, IMapper mapper, MenuRepository menuRepository, ICurrentUserInfo currentUserInfo)
         {
             _logger = logger;
             _mapper = mapper;
             _munuRepo = menuRepository;
+            _currentUser = currentUserInfo;
         }
 
+        /// <summary>
+        /// 创建菜单
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
         public async Task<OperationMessage> CreateMenu(MenuCreateDataModel dataModel)
         {
             try
             {
+                if (await _munuRepo.Select.Where(a => a.MenuName == dataModel.MenuName).AnyAsync())
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, "菜单名称已存在,请更换一个名称后再试!");
+                }
                 var menuData = _mapper.Map<MenuCreateDataModel, MenuInfo>(dataModel);
-                menuData.CreateBy = "System";
+                menuData.CreateBy = string.IsNullOrWhiteSpace(_currentUser.UserName) ? "System" : _currentUser.UserName;
                 menuData.CreateDateTime = DateTimeOffset.Now;
-                menuData.LastModifyBy = "System";
+                menuData.LastModifyBy = string.IsNullOrWhiteSpace(_currentUser.UserName) ? "System" : _currentUser.UserName; ;
                 menuData.LastModifyDate = DateTimeOffset.Now;
                 //menuData.
                 await _munuRepo.InsertAsync(menuData);
@@ -63,6 +69,55 @@ namespace DolphinCloud.DataServices.System
             }
         }
 
+        /// <summary>
+        /// 逻辑删除菜单
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> DeleteMenuAsync(MenuDataViewModel dataModel)
+        {
+            try
+            {
+                var CurrentDataEntity = await _munuRepo.Select.Where(a => a.MenuID == dataModel.MenuID)
+                    .ToUpdate()
+                    .Set(a => a.DeleteFG, true)
+                    .Set(a => a.LastModifyBy, _currentUser.UserName)
+                    .Set(a => a.LastModifyDate, DateTimeOffset.Now)
+                    .ExecuteAffrowsAsync();
+                if (CurrentDataEntity > 0)
+                {
+                    return new OperationMessage(ResponseCode.OperationSuccess, "删除菜单成功");
+                }
+                else
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, "未查询到符合条件的菜单信息数据,删除失败");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"逻辑删除菜单异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"逻辑删除菜单异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 获得上级菜单下拉框选项
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResultMessage<List<OptionDataModel>>> GetMenuSelectOptionAsync()
+        {
+            try
+            {
+                var dataList = await _munuRepo.Select.Where(a => a.DeleteFG == false).ToListAsync(a => new OptionDataModel { OptionName = a.MenuName, OptionValue = a.MenuID.ToString() });
+                return new ResultMessage<List<OptionDataModel>>(ResponseCode.OperationSuccess, "获取上级菜单下拉框选项成功", dataList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"获取上级菜单下拉框选项异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<List<OptionDataModel>>(ResponseCode.ServerError, $"获取上级菜单下拉框选项异常,异常原因为:【{ex.Message}】", null);
+            }
+        }
+
         public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTableAsync(MenuParameter pagination)
         {
             try
@@ -70,8 +125,8 @@ namespace DolphinCloud.DataServices.System
                 long totalDataCount = 0;
                 var MenuList = await _munuRepo.Select
                     .Page(pagination.PageIndex, pagination.PageSize)
-                    .Count(out totalDataCount)
-                    .Where(a => a.DeleteFG == false)
+                     .Where(a => a.DeleteFG == false)
+                    .Count(out totalDataCount)                   
                     .ToListAsync();
                 var DataModel = _mapper.Map<List<MenuInfo>, List<MenuDataViewModel>>(MenuList);
                 return new PaginationResult<List<MenuDataViewModel>>(ResponseCode.OperationSuccess, "查询成功", totalDataCount, DataModel);
@@ -83,21 +138,89 @@ namespace DolphinCloud.DataServices.System
             }
         }
 
-        public Task InitMenuData(Type baseController)
+        /// <summary>
+        /// 获得导航栏数据模型
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<SideBarNavDataModel>> GetSideBarNavDataModelsAsync()
         {
             try
             {
-
+                var MenuList = await _munuRepo.Select.Where(a => a.DeleteFG == false).ToTreeListAsync();
+                var DataModel = _mapper.Map<List<MenuInfo>, List<SideBarNavDataModel>>(MenuList);
+                return DataModel;
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, $"获得导航栏数据模型异常,异常原因为:【{ex.Message}】");
                 throw;
             }
-
-            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 根据菜单数据主键获得菜单信息
+        /// 用于更新菜单信息
+        /// </summary>
+        /// <param name="MenuID"></param>
+        /// <returns></returns>
+        public async Task<ResultMessage<MenuModifyDataModel>> GetMenuDataModelByMenuIDAsync(int MenuID)
+        {
+            try
+            {
+                if (MenuID > 0)
+                {
+                    var DataEntity = await _munuRepo.Select.Where(a => a.MenuID == MenuID).ToOneAsync();
+                    if (DataEntity != null)
+                    {
+                        var DataModel = _mapper.Map<MenuInfo, MenuModifyDataModel>(DataEntity);
+                        return new ResultMessage<MenuModifyDataModel>(ResponseCode.OperationSuccess, "查询成功", DataModel);
+                    }
+                }
+                return new ResultMessage<MenuModifyDataModel>(ResponseCode.OperationWarning, "未查询到符合条件的菜单信息数据");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"根据菜单ID获得菜单信息查询异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<MenuModifyDataModel>(ResponseCode.ServerError, $"根据菜单ID获得菜单信息查询异常,异常原因为:【{ex.Message}】");
+            }
+        }
+        /// <summary>
+        /// 更新菜单信息
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> UpdateMenuDataAsync(MenuModifyDataModel dataModel)
+        {
+            try
+            {
+                var CurrentDataEntity = await _munuRepo.Select.Where(a => a.MenuID == dataModel.MenuID).ToOneAsync();
+                if (CurrentDataEntity != null)
+                {
+                    var result = await _munuRepo.UpdateDiy.SetIf(dataModel.MenuName != CurrentDataEntity.MenuName, a => a.MenuName, dataModel.MenuName)
+                          .SetIf(dataModel.MenuIcon != CurrentDataEntity.MenuIcon, a => a.MenuIcon, dataModel.MenuIcon)
+                          .SetIf(dataModel.MenuUrlAddress != CurrentDataEntity.MenuUrlAddress, a => a.MenuUrlAddress, dataModel.MenuUrlAddress)
+                          .SetIf(dataModel.SortNumber != CurrentDataEntity.SortNumber, a => a.SortNumber, dataModel.SortNumber)
+                          .SetIf(dataModel.MenuType != CurrentDataEntity.MenuType, a => a.MenuType, dataModel.MenuType)
+                          .SetIf(dataModel.ParentID != null && dataModel.ParentID != CurrentDataEntity.ParentID, a => a.ParentID, dataModel.ParentID)
+                          .SetIf(dataModel.ControllerName != CurrentDataEntity.ControllerName, a => a.ControllerName, dataModel.ControllerName)
+                          .SetIf(dataModel.AreaName != CurrentDataEntity.AreaName, a => a.AreaName, dataModel.AreaName)
+                          .SetIf(dataModel.ActionName != CurrentDataEntity.ActionName, a => a.ActionName, dataModel.ActionName)
+                          .Set(a => a.LastModifyBy, _currentUser.UserName)
+                          .Set(a => a.LastModifyDate, DateTimeOffset.Now)
+                          .Where(a => a.MenuID == dataModel.MenuID).ExecuteAffrowsAsync();
+                    return new OperationMessage(ResponseCode.OperationSuccess, "菜单信息更新成功");
+                }
+                else
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, "未查询到符合条件的菜单信息数据,更新失败");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"更新菜单信息异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"更新菜单信息异常,异常原因为:【{ex.Message}】");
+            }
+        }
         public async Task InitMenuData(IEnumerable<Type> assemblyList)
         {
             try

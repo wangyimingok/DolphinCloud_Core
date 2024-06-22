@@ -1,0 +1,129 @@
+﻿@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@model DolphinCloud.DataModel.System.Menu.MenuCreateDataModel
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" method="post" lay-filter="menu-formfilter">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">菜单名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" asp-for="MenuName" id="menuName" lay-verify="required" autocomplete="off" placeholder="请输入菜单名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">上级菜单</label>
+                    <div class="layui-input-block">
+                        <select asp-for="ParentID" id="parentMenu" lay-search="">
+                            <option value="">直接选择或搜索选择</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">区域名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" asp-for="AreaName" autocomplete="off" placeholder="请输入所属区域名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">控制器名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" asp-for="ControllerName" autocomplete="off" placeholder="请输入控制器名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">动作名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" asp-for="ActionName" autocomplete="off" placeholder="请输入动作名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">图标</label>
+                    <div class="layui-input-block">
+                        <input type="text" asp-for="MenuIcon" id="iconPicker" lay-filter="iconPicker" class="hide">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序值</label>
+                    <div class="layui-input-block">
+                        <input type="number" asp-for="SortNumber" placeholder="排序值" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">菜单类型</label>
+                    <div class="layui-input-block">
+                        <input type="radio" asp-for="MenuType" value="1" title="顶级菜单" checked>
+                        <input type="radio" asp-for="MenuType" value="2" title="子菜单">
+                        <input type="radio" asp-for="MenuType" value="3" title="功能/按钮">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-hide">
+                    <input type="button" lay-submit lay-filter="menuCreateSubmitFilter" id="btnMenuSubmit" value="确认">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.config({
+        base: '@Url.Content("~/lib/layuiadmin/")' // 静态资源所在路径
+    }).extend({
+        iconPicker: 'modules/iconPicker/iconPicker'
+    }).use(['iconPicker', 'form', 'layer'], function () {
+        var iconPicker = layui.iconPicker,
+            form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+        iconPicker.render({
+            // 选择器，推荐使用input
+            elem: '#iconPicker',
+            // 数据类型：fontClass/unicode，推荐使用fontClass
+            type: 'fontClass',
+            // 是否开启搜索：true/false，默认true
+            search: true,
+            // 是否开启分页：true/false，默认true
+            page: true,
+            // 每页显示数量，默认12
+            limit: 12,
+            // 点击回调
+            click: function (data) {
+                console.log(data);
+            },
+            // 渲染成功后的回调
+            success: function (d) {
+                console.log(d);
+            }
+        });
+        // 自定义验证规则
+        form.verify({
+            // 确认密码
+            confirmPassword: function (value, item) {
+                var passwordValue = $('#userPasswrod').val();
+                if (value !== passwordValue) {
+                    return '两次密码输入不一致';
+                }
+            }
+        });
+
+        $.ajax({
+            url: "/Admin/Menu/GetMenuSelectOption",
+            type: 'GET',
+            success: function (data) {
+                if (data.responseCode == 200) {
+                    $.each(data.data, function (index, item) {
+                        $('#parentMenu').append(new Option(item.optionName, item.optionValue));// 下拉菜单里添加元素
+                    });
+                    layui.form.render("select");
+                }
+            },
+            error: function (data) {
+                alert(data);
+                console.log(data);
+            }
+        });
+    });
+</script>

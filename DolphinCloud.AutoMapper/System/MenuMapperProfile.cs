@@ -12,12 +12,16 @@ namespace DolphinCloud.AutoMapper.System
     /// <summary>
     /// 菜单映射配置
     /// </summary>
-    public class MenuMapperProfile: Profile
+    public class MenuMapperProfile : Profile
     {
         public MenuMapperProfile()
         {
             CreateMap<MenuDataViewModel, MenuInfo>().ReverseMap();
             CreateMap<MenuCreateDataModel, MenuInfo>().ReverseMap();
+            CreateMap<MenuModifyDataModel, MenuInfo>().ReverseMap();
+            CreateMap<SideBarNavDataModel, MenuInfo>()
+                .ForMember(entity => entity.ChildMenuData, dest => dest.MapFrom(model => model.childMenuData))
+                .ReverseMap();
         }
     }
 }

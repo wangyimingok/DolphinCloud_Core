@@ -186,6 +186,12 @@ namespace DolphinCloud.DataServices.System
             }
         }
 
+        /// <summary>
+        /// 根据用户主键获取用户信息
+        /// 用于更新
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
         public async Task<ResultMessage<UserModifyDataModel>> GetUserDataModelByUserIDAsync(long UserID)
         {
             try
