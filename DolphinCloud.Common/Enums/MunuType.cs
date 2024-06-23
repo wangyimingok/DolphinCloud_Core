@@ -20,8 +20,12 @@ namespace DolphinCloud.Common.Enums
         /// </summary>
         ChildMenu = 2,
         /// <summary>
+        /// 页面
+        /// </summary>
+        PageView = 3,
+        /// <summary>
         /// 按钮/功能
         /// </summary>
-        Button_Function = 3
+        Button_Function = 4
     }
 }

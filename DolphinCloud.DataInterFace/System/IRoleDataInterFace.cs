@@ -43,5 +43,7 @@ namespace DolphinCloud.DataInterFace.System
         /// <param name="dataModel"></param>
         /// <returns></returns>
         Task<OperationMessage> DeleteRoleAsync(RoleDataViewModel dataModel);
+
+        Task<ResultMessage<RoleAuthorDataModel>> GetRoleAuthorDataModelAsync(int RoleID);
     }
 }

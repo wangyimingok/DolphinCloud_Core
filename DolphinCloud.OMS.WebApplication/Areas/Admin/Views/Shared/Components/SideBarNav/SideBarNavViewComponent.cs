@@ -23,7 +23,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Views.Shared.Components.Si
             //var menuList =await _menuData.GetSideBarNavDataModelsAsync();
             var model = new SideBarNavViewModel
             {
-                MenuData = await _menuData.GetSideBarNavDataModelsAsync()
+                MenuData = await _menuData.GetSideBarNavDataModelsAsync("Admin")
             };
             return View(model);
         }

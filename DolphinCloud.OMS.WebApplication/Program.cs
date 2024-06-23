@@ -1,20 +1,15 @@
+using DolphinCloud.AutoMapper;
+using DolphinCloud.Common.Constants;
+using DolphinCloud.Common.ContractResolver;
+using DolphinCloud.Common.Extentions;
 using DolphinCloud.Common.Snowflake;
 using DolphinCloud.Framework.Dependency;
 using DolphinCloud.OMS.WebApplication.Initialization;
-using Microsoft.AspNetCore.Mvc;
+using DolphinCloud.Repository;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using Serilog.Exceptions;
-using DolphinCloud.Common.Extentions;
-using Newtonsoft.Json.Serialization;
-using DolphinCloud.Common.ContractResolver;
-using DolphinCloud.Common.Constants;
-using DolphinCloud.Repository;
-using DolphinCloud.AutoMapper;
-using Microsoft.AspNetCore.Http.Features;
-using DolphinCloud.DataInterFace.System;
-using System.Reflection;
-using DolphinCloud.OMS.WebApplication.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 // 指定应用运行时配置文件
@@ -95,7 +90,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-
+//app.UseMiddleware<InitSystemDataMiddleware>();
 app.UseRouting();
 //启用权限验证
 app.UseAuthentication();

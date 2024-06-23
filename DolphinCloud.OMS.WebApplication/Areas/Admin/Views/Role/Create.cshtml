@@ -14,7 +14,7 @@
                     <div class="layui-input-block">
                         <input type="text" asp-for="RoleName" id="roleName" lay-verify="required" autocomplete="off" placeholder="请输入角色名称" class="layui-input">
                     </div>
-                </div>                
+                </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">角色描述</label>
                     <div class="layui-input-block">
@@ -26,7 +26,7 @@
                     <div class="layui-input-block">
                         <textarea name="remarks" asp-for="Remarks" placeholder="备注信息添加在这里" class="layui-textarea"></textarea>
                     </div>
-                </div>              
+                </div>
                 <div class="layui-form-item layui-hide">
                     <input type="button" lay-submit lay-filter="roleCreateSubmitFilter" id="btnRoleSubmit" value="确认">
                 </div>
@@ -37,11 +37,10 @@
 <script type="text/javascript">
     layui.config({
         base: '@Url.Content("~/lib/layuiadmin/")' // 静态资源所在路径
-    }).use([ 'form', 'layer'], function () {
+    }).use(['form', 'layer'], function () {
         var form = layui.form,
             layer = layui.layer,
-            $ = layui.$;
-        
+            $ = layui.$,
         // 自定义验证规则
         form.verify({
             // 确认密码
@@ -51,6 +50,6 @@
                     return '两次密码输入不一致';
                 }
             }
-        });       
+        });
     });
 </script>

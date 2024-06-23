@@ -10,6 +10,7 @@ using DolphinCloud.Framework.Session;
 using DolphinCloud.Repository.System;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using static FreeSql.Internal.GlobalFilter;
 
 namespace DolphinCloud.DataServices.System
 {
@@ -108,7 +109,7 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var dataList = await _munuRepo.Select.Where(a => a.DeleteFG == false).ToListAsync(a => new OptionDataModel { OptionName = a.MenuName, OptionValue = a.MenuID.ToString() });
+                var dataList = await _munuRepo.Select.Where(a => a.MenuType <= 2 && a.DeleteFG == false).ToListAsync(a => new OptionDataModel { OptionName = a.MenuName, OptionValue = a.MenuID.ToString() });
                 return new ResultMessage<List<OptionDataModel>>(ResponseCode.OperationSuccess, "获取上级菜单下拉框选项成功", dataList);
             }
             catch (Exception ex)
@@ -118,6 +119,11 @@ namespace DolphinCloud.DataServices.System
             }
         }
 
+        /// <summary>
+        /// 分页获得菜单列表
+        /// </summary>
+        /// <param name="pagination"></param>
+        /// <returns></returns>
         public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTableAsync(MenuParameter pagination)
         {
             try
@@ -125,8 +131,8 @@ namespace DolphinCloud.DataServices.System
                 long totalDataCount = 0;
                 var MenuList = await _munuRepo.Select
                     .Page(pagination.PageIndex, pagination.PageSize)
-                    .Where(a => a.DeleteFG == false)
-                    .Count(out totalDataCount)                   
+                    .Where(a => a.MenuType >= 2 && a.DeleteFG == false)
+                    .Count(out totalDataCount)
                     .ToListAsync();
                 var DataModel = _mapper.Map<List<MenuInfo>, List<MenuDataViewModel>>(MenuList);
                 return new PaginationResult<List<MenuDataViewModel>>(ResponseCode.OperationSuccess, "查询成功", totalDataCount, DataModel);
@@ -142,11 +148,14 @@ namespace DolphinCloud.DataServices.System
         /// 获得导航栏数据模型
         /// </summary>
         /// <returns></returns>
-        public async Task<List<SideBarNavDataModel>> GetSideBarNavDataModelsAsync()
+        public async Task<List<SideBarNavDataModel>> GetSideBarNavDataModelsAsync(string AreaName = "")
         {
             try
             {
-                var MenuList = await _munuRepo.Select.Where(a => a.DeleteFG == false).ToTreeListAsync();
+                var MenuList = await _munuRepo.Select
+                    .Where(a => a.MenuType <= 2 && a.DeleteFG == false)
+                    .WhereIf(!string.IsNullOrWhiteSpace(AreaName), a => a.AreaName == AreaName)
+                    .ToTreeListAsync();
                 var DataModel = _mapper.Map<List<MenuInfo>, List<SideBarNavDataModel>>(MenuList);
                 return DataModel;
             }
@@ -221,40 +230,63 @@ namespace DolphinCloud.DataServices.System
                 return new OperationMessage(ResponseCode.ServerError, $"更新菜单信息异常,异常原因为:【{ex.Message}】");
             }
         }
+
+        /// <summary>
+        /// 获得权限树控件数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResultMessage<List<LayuiTreeDataModel>>> GetPermissionTreeData()
+        {
+            try
+            {
+                var DataEntityList = await _munuRepo.Select.Where(a => a.AreaName == "Admin" && a.DeleteFG == false).ToTreeListAsync();
+                var DataModel = _mapper.Map<List<MenuInfo>, List<LayuiTreeDataModel>>(DataEntityList);
+                return new ResultMessage<List<LayuiTreeDataModel>>(ResponseCode.OperationSuccess, "查询成功", DataModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,$"获得树控件数据异常,异常原因为：【{ex.Message}】");
+               return new ResultMessage<List<LayuiTreeDataModel>>(ResponseCode.ServerError, $"获得树控件数据失败",null);
+            }
+        }
         public async Task InitMenuData(IEnumerable<Type> assemblyList)
         {
             try
             {
                 List<MenuInfo> menuList = new List<MenuInfo>();
-
-                //var ControllerList= assemblyList.Where(t=>t.GetCustomAttributes<MenuAttribute>().Any());
                 foreach (var controller in assemblyList)
                 {
-                    var MethodsList = controller.GetMethods().Where(a => a.GetCustomAttributes<MenuAttribute>().Any());
-                    foreach (var method in MethodsList)
+                    var methodList = controller.GetMethods().Where(a => a.IsPublic == true).Where(m => m.Module.Name.StartsWith("DolphinCloud.OMS.WebApplication")).ToList();
+                    foreach (var currentMethod in methodList)
                     {
-                        MenuInfo menu = new MenuInfo();
-                        var menuAttribute = method.GetCustomAttribute<MenuAttribute>();
-                        menu.AreaName = menuAttribute.DomainName;
-                        menu.MenuName = menuAttribute.DisplayName;
-                        menu.ControllerName = controller.Name.Replace("Controller", "");
-                        menu.ActionName = method.Name;
-                        menu.SortNumber = menuAttribute.SortNumber == 0 ? (short)0 : (short)menuAttribute.SortNumber;
-                        menu.MenuType = (short)menuAttribute.MenuType;
-                        // menu.ParentID = menuAttribute.ParentID;
-                        if (string.IsNullOrWhiteSpace(menuAttribute.DomainName))
+                        foreach (Attribute attribute in currentMethod.GetCustomAttributes())
                         {
-                            menu.MenuUrlAddress = $"{menu.ControllerName}/{menu.ActionName}";
+                            if (attribute is MenuAttribute menu)
+                            {
+
+                                MenuInfo menuInfo = new MenuInfo();
+                                menuInfo.AreaName = menu.DomainName;
+                                menuInfo.MenuName = menu.DisplayName;
+                                menuInfo.ControllerName = controller.Name.Replace("Controller", "");
+                                menuInfo.ActionName = currentMethod.Name;
+                                menuInfo.SortNumber = menu.SortNumber == 0 ? (short)0 : (short)menu.SortNumber;
+                                menuInfo.MenuType = (short)menu.MenuType;
+                                //menuInfo.ParentID = menu.ParentID;
+                                if (string.IsNullOrWhiteSpace(menu.DomainName))
+                                {
+                                    menuInfo.MenuUrlAddress = $"{menuInfo.ControllerName}/{menuInfo.ActionName}";
+                                }
+                                else
+                                {
+                                    menuInfo.MenuUrlAddress = $"{menuInfo.AreaName}/{menuInfo.ControllerName}/{menuInfo.ActionName}";
+                                }
+                                menuInfo.CreateBy = "System";
+                                menuInfo.CreateDateTime = DateTimeOffset.Now;
+                                menuInfo.LastModifyBy = "System";
+                                menuInfo.LastModifyDate = DateTimeOffset.Now;
+                                menuList.Add(menuInfo);
+                            }
                         }
-                        else
-                        {
-                            menu.MenuUrlAddress = $"{menu.AreaName}/{menu.ControllerName}/{menu.ActionName}";
-                        }
-                        menu.CreateBy = "System";
-                        menu.CreateDateTime = DateTimeOffset.Now;
-                        menu.LastModifyBy = "System";
-                        menu.LastModifyDate = DateTimeOffset.Now;
-                        menuList.Add(menu);
                     }
                 }
                 var MenuListData = await _munuRepo.Where(a => a.DeleteFG == false).ToListAsync();
@@ -273,17 +305,14 @@ namespace DolphinCloud.DataServices.System
                             item.ParentID = 0;
                             item.MenuUrlAddress = "#";
                         }
-                        //await _munuRepo.InsertAsync(item);
+                        await _munuRepo.InsertAsync(item);
                     }
                 }
-
             }
             catch (Exception ex)
             {
-
-                throw;
+                _logger.LogError(ex, $"利用反射技术自动增加菜单异常,异常原因为:【{ex.Message}】");
             }
-            throw new NotImplementedException();
         }
     }
 }

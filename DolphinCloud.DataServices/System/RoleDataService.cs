@@ -98,6 +98,26 @@ namespace DolphinCloud.DataServices.System
         }
 
         /// <summary>
+        /// 根据角色数据主键获取角色授权数据模型
+        /// </summary>
+        /// <param name="RoleID"></param>
+        /// <returns></returns>
+        public async Task<ResultMessage<RoleAuthorDataModel>> GetRoleAuthorDataModelAsync(int RoleID)
+        {
+            try
+            {
+                var DataEntity = await _roleRepo.Where(m => m.RoleID == RoleID).ToOneAsync();
+                var result = _mapper.Map<RoleAuthorDataModel>(DataEntity);
+                return new ResultMessage<RoleAuthorDataModel>(ResponseCode.OperationSuccess, "获取角色授权数据模型成功", result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"根据角色ID获取角色授权数据模型异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<RoleAuthorDataModel>(ResponseCode.ServerError, "获取角色授权数据模型失败");
+            }
+        }
+
+        /// <summary>
         /// 根据角色ID获取角色信息
         /// </summary>
         /// <param name="RoleID"></param>

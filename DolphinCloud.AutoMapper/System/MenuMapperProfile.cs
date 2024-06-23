@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DolphinCloud.DataEntity.System;
+using DolphinCloud.DataModel.Base;
 using DolphinCloud.DataModel.System.Menu;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,11 @@ namespace DolphinCloud.AutoMapper.System
             CreateMap<MenuModifyDataModel, MenuInfo>().ReverseMap();
             CreateMap<SideBarNavDataModel, MenuInfo>()
                 .ForMember(entity => entity.ChildMenuData, dest => dest.MapFrom(model => model.childMenuData))
+                .ReverseMap();
+            CreateMap<LayuiTreeDataModel, MenuInfo>()
+                .ForMember(entity => entity.MenuID, dest => dest.MapFrom(model => model.TreeID))
+                 .ForMember(entity => entity.MenuName, dest => dest.MapFrom(model => model.NodeName))
+                .ForMember(entity => entity.ChildMenuData, dest => dest.MapFrom(model => model.Children))
                 .ReverseMap();
         }
     }

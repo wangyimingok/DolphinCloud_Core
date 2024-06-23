@@ -54,13 +54,38 @@ namespace DolphinCloud.Common.Attributes
         /// <param name="menuType">菜单类型</param>
         /// <param name="displayName">菜单显示名称</param>
         /// <param name="sortNumber">排序值</param>
-        /// <param name="domainName">菜单类型</param>
+        /// <param name="domainName">所属区域</param>
         public MenuAttribute(MunuType menuType, string displayName, int sortNumber, string domainName = null)
         {
             SortNumber = sortNumber;
             DisplayName = displayName;
             DomainName = domainName;
             MenuType = menuType;
+        }
+        /// <summary>
+        /// 构建实例
+        /// </summary>
+        /// <param name="menuType">菜单类型</param>
+        /// <param name="displayName">菜单显示名称</param>
+        /// <param name="sortNumber">排序值</param>
+        /// <param name="domainName">所属区域</param>
+        public MenuAttribute(MunuType menuType, string displayName)
+        {
+            DisplayName = displayName;
+            MenuType = menuType;
+        }
+
+        /// <summary>
+        /// 构建实例
+        /// </summary>
+        /// <param name="displayName">菜单显示名称</param>
+        /// <param name="menuType">菜单类型</param>
+        /// <param name="domainName">所属区域</param>
+        public MenuAttribute (string displayName, MunuType menuType,string domainName = null)
+        {
+            DisplayName = displayName;
+            MenuType = menuType;
+            DomainName = domainName;
         }
     }
 }

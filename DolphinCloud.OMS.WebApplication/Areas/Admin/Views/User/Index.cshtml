@@ -50,11 +50,12 @@
             }],
             method: "POST",
             contentType: "application/json",
-            headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
-            height: 'full-100', // 最大高度减去其他容器已占有的高度差
+            headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },            
             cellMinWidth: 80,
             toolbar: '#userToolbar',
-            page: true,
+            page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+            },
             cols: [[
                 { field: 'userID', title: '主键', sort: true },
                 { field: 'userName', title: '用户名', sort: true, align: 'center' },
@@ -180,26 +181,5 @@
                     break;
             };
         });
-        //触发表格复选框选择
-        table.on('checkbox(test-table-index)', function (obj) {
-            console.log(obj)
-        });
-
-        //触发表格单选框选择
-        table.on('radio(test-table-index)', function (obj) {
-            console.log(obj)
-        });
-
-        // 行单击事件
-        table.on('row(test-table-index)', function (obj) {
-            //console.log(obj);
-            //layer.closeAll('tips');
-        });
-        // 行双击事件
-        table.on('rowDouble(test-table-index)', function (obj) {
-            console.log(obj);
-        });
-    });
-
-   
+    });   
 </script>

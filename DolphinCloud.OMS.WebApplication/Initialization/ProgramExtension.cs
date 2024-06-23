@@ -5,12 +5,14 @@ using DolphinCloud.Common.Constants;
 using DolphinCloud.DataInterFace.System;
 using DolphinCloud.Framework.Dependency;
 using DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers;
+using DolphinCloud.OMS.WebApplication.Controllers;
 using DolphinCloud.OMS.WebApplication.Initialization.CustomizeAuthen;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -96,7 +98,7 @@ namespace DolphinCloud.OMS.WebApplication.Initialization
             {
                 var DefaultPolicy = new AuthorizationPolicyBuilder();
                 DefaultPolicy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.ClientArea));
-                options.DefaultPolicy = DefaultPolicy.Build() ;
+                options.DefaultPolicy = DefaultPolicy.Build();
                 options.AddPolicy(PermissionPolicy.AdminArea, policy => policy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.AdminArea)));
                 options.AddPolicy(PermissionPolicy.ClientArea, policy => policy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.ClientArea)));
                 //options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
@@ -179,6 +181,31 @@ namespace DolphinCloud.OMS.WebApplication.Initialization
         {
             webBuilder.WebHost.UseConfiguration(configuration)
                 .UseKestrel();
+        }
+
+        internal static void Init(this IServiceCollection services)
+        {
+            var controllerTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => typeof(Controller).IsAssignableFrom(type));
+            foreach (var item in controllerTypes)
+            {
+
+            }
+            //app.Use(async (context, next) =>
+            //{
+            //    var menuData = context.RequestServices.GetService<IMenuDataInterFace>(); //.Get<IMenuDataInterFace>();
+            //    if (menuData != null)
+            //    {
+            //        var controllerList = Assembly.GetExecutingAssembly().GetTypes().Where(a => a.BaseType == typeof(BaseController));
+            //        await menuData.InitMenuData(controllerList);
+            //    }
+            //    var userData = context.RequestServices.GetService<IUserDataInterFace>();
+            //    if (userData != null)
+            //    {
+            //        await userData.GenerateAdmin();
+            //    }
+            //    await next();
+            //});
+
         }
     }
 }

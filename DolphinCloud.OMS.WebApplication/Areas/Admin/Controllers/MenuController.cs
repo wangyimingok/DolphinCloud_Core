@@ -30,7 +30,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Menu(MunuType.RootMenu, "菜单管理", 99, "Admin")]
+        [Menu(MunuType.ChildMenu, "菜单管理", 99, "Admin")]
         public IActionResult Index()
         {
             return View();
@@ -40,6 +40,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// 创建菜单视图页
         /// </summary>
         /// <returns></returns>
+        [Menu(MunuType.PageView, "创建菜单", 99, "Admin")]
         public async Task<IActionResult> Create()
         {
             return await Task.FromResult(View());
@@ -76,6 +77,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// 编辑菜单视图页
         /// </summary>
         /// <returns></returns>
+        [Menu(MunuType.PageView, "编辑菜单", 2, "Admin")]
         public async Task<IActionResult> Edit(int MenuID)
         {
             var result = await _menuData.GetMenuDataModelByMenuIDAsync(MenuID);
@@ -92,6 +94,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="dataModel"></param>
         /// <returns></returns>
+        [Menu(MunuType.Button_Function, "编辑菜单", 2, "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromBody] MenuModifyDataModel dataModel)
         {
@@ -119,6 +122,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="pagination"></param>
         /// <returns></returns>
+        [Menu(MunuType.Button_Function, "获取菜单列表",3, "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<PaginationResult<List<MenuDataViewModel>>> GetMenuTable([FromBody]MenuParameter pagination)
         {
@@ -131,6 +135,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<JsonResult> GetMenuSelectOption()
         {
             var result = await _menuData.GetMenuSelectOptionAsync();
@@ -138,15 +143,28 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         }
 
         /// <summary>
-        /// 逻辑删除用户
+        /// 逻辑删除菜单
         /// </summary>
         /// <param name="dataModel"></param>
         /// <returns></returns>
+        [Menu(MunuType.Button_Function, "删除菜单", 4, "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> DeleteMenu([FromBody] MenuDataViewModel dataModel)
         {
             var result = await _menuData.DeleteMenuAsync(dataModel);
             return Json(result);
+        }
+
+        /// <summary>
+        /// 获得权限树控件数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<JsonResult> GetPermissionTreeData()
+        {
+            var result = await _menuData.GetPermissionTreeData();
+            return new JsonResult(result);
         }
     }
 }

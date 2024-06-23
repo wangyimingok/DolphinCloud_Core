@@ -36,7 +36,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// 用户信息首页
         /// </summary>
         /// <returns></returns>
-        [Menu(MunuType.RootMenu, "用户管理", 98, "Admin")]
+        [Menu(MunuType.ChildMenu, "用户管理", 98, "Admin")]
         public async Task<IActionResult> Index()
         {
             var result = await _user.GenerateAdmin();
@@ -47,6 +47,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// 创建用户视图
         /// </summary>
         /// <returns></returns>
+        [Menu("用户创建", MunuType.PageView, "Admin")]
         public async Task<IActionResult> Create()
         {
             return await Task.FromResult(View());
@@ -93,6 +94,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// <param name="pagination"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [Menu("用户列表", MunuType.Button_Function, "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<PaginationResult<List<UserDataViewModel>>> GetUserPaginationDataList([FromBody] UserPagination pagination, CancellationToken cancellationToken)
         {
@@ -105,6 +107,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="UserID"></param>
         /// <returns></returns>
+        [Menu("更新用户信息", MunuType.PageView, "Admin")]
         [HttpGet]
         public async Task<IActionResult> Edit(long UserID)
         {
@@ -122,6 +125,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="dataModel"></param>
         /// <returns></returns>
+        [Menu("更新用户信息", MunuType.Button_Function, "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> Edit([FromBody] UserModifyDataModel dataModel)
         {
@@ -134,6 +138,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="UserName"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<JsonResult> UserNameIsExist(string UserName)
         {
@@ -146,6 +151,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="UserName"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<JsonResult> EmailAddressIsExist(string emailAddress)
         {
@@ -158,6 +164,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="UserName"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<JsonResult> MobilePhoneIsExist(string mobilePhoneNumber)
         {
@@ -170,6 +177,7 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
         /// </summary>
         /// <param name="dataModel"></param>
         /// <returns></returns>
+        [Menu("删除用户信息", MunuType.Button_Function, "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> DeleteUser([FromBody] UserDataViewModel dataModel)
         {

@@ -44,7 +44,7 @@ namespace DolphinCloud.DataInterFace.System
         /// 获得导航栏数据模型
         /// </summary>
         /// <returns></returns>
-        Task<List<SideBarNavDataModel>> GetSideBarNavDataModelsAsync();
+        Task<List<SideBarNavDataModel>> GetSideBarNavDataModelsAsync(string AreaName = "");
 
         /// <summary>
         /// 逻辑删除菜单数据
@@ -52,5 +52,11 @@ namespace DolphinCloud.DataInterFace.System
         /// <param name="dataModel"></param>
         /// <returns></returns>
         Task<OperationMessage> DeleteMenuAsync(MenuDataViewModel dataModel);
+
+        /// <summary>
+        /// 获得权限树控件数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ResultMessage<List<LayuiTreeDataModel>>> GetPermissionTreeData();
     }
 }
