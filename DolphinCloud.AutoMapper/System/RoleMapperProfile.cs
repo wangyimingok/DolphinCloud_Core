@@ -12,7 +12,7 @@ namespace DolphinCloud.AutoMapper.System
     /// <summary>
     /// 角色映射配置
     /// </summary>
-    public class RoleMapperProfile: Profile
+    public class RoleMapperProfile : Profile
     {
         public RoleMapperProfile()
         {
@@ -21,6 +21,10 @@ namespace DolphinCloud.AutoMapper.System
             CreateMap<RoleModifyDataModel, RoleInfo>().ReverseMap();
             CreateMap<RolePagination, RoleInfo>().ReverseMap();
             CreateMap<RoleAuthorDataModel, RoleInfo>().ReverseMap();
+            CreateMap<RoleAuthorityDataModel, RoleAuthorityInfo>()
+                .ForMember(entity => entity.MenuID, dest => dest.MapFrom(model => model.PermissionID))
+                .ForMember(entity => entity.RoleID, dest => dest.MapFrom(model => model.RoleID))
+                .ReverseMap();
         }
     }
 }

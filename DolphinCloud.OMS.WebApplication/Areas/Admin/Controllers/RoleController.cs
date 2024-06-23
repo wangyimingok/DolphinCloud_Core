@@ -124,10 +124,15 @@ namespace DolphinCloud.OMS.WebApplication.Areas.Admin.Controllers
             }
             return await Task.FromResult(View());
         }
-
+        /// <summary>
+        /// 为角色授权
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> Authorization([FromBody] RoleAuthorDataModel dataModel)
         { 
+            var result = await _roleData.ConfigPermissionByRoleAsync(dataModel);
             return  new JsonResult(new OperationMessage(ResponseCode.OperationSuccess, "授权成功"));
         }
     }

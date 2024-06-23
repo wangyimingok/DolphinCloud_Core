@@ -58,5 +58,7 @@ namespace DolphinCloud.DataInterFace.System
         /// </summary>
         /// <returns></returns>
         Task<ResultMessage<List<LayuiTreeDataModel>>> GetPermissionTreeData();
+
+        
     }
 }

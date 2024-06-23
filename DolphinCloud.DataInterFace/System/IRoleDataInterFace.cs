@@ -44,6 +44,18 @@ namespace DolphinCloud.DataInterFace.System
         /// <returns></returns>
         Task<OperationMessage> DeleteRoleAsync(RoleDataViewModel dataModel);
 
+        /// <summary>
+        /// 根据角色ID获取角色授权数据模型
+        /// </summary>
+        /// <param name="RoleID"></param>
+        /// <returns></returns>
         Task<ResultMessage<RoleAuthorDataModel>> GetRoleAuthorDataModelAsync(int RoleID);
+
+        /// <summary>
+        /// 对角色进行授权
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        Task<OperationMessage> ConfigPermissionByRoleAsync(RoleAuthorDataModel dataModel);
     }
 }

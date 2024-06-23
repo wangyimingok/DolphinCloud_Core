@@ -136,7 +136,7 @@
                     maxmin: true, //开启最大化最小化按钮
                     type: 2,
                     area: ['400px', '500px'],
-                    content: '/Admin/User/Edit?UserID=' + data.userID,
+                    content: '/Admin/User/Edit?UserID=' + obj.data.userID,
                     end: function () {
                         //回调重新刷新表格
                         table.reload('userTable');
