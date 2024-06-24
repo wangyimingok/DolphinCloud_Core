@@ -1,0 +1,47 @@
+﻿@using DolphinCloud.OMS.AdminWeb.Views.Shared.Components.SideBarNav
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DolphinCloud.OMS.WebApplication</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="~/lib/layuiadmin/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/lib/layuiadmin/adminui/dist/css/admin.css" rel="stylesheet" />
+</head>
+<body class="layui-layout-body" id="LAY_home_iframe">
+    <div id="LAY_app" style="visibility: hidden">
+        <div class="layui-layout layui-layout-admin">
+
+            @await Html.PartialAsync("_Header")
+            <!-- 侧边菜单 -->
+            <div class="layui-side layui-side-menu">
+                @await Component.InvokeAsync(typeof(SideBarNavViewComponent))
+            </div>
+
+            <!-- 页面标签 -->
+            @await Html.PartialAsync("_TabsView")
+
+
+            <!-- 主体内容 -->
+            <div class="layui-body" id="LAY_app_body">
+                @RenderBody()
+            </div>
+
+            <!-- 辅助元素，一般用于移动设备下遮罩 -->
+            <div class="layadmin-body-shade" layadmin-event="shade"></div>
+        </div>
+    </div>
+    <script src="~/lib/layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '@Url.Content("~/lib/layuiadmin/")' // 静态资源所在路径
+        }).use(['index']);
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <!--脚本引用 End-->
+    <mini-profiler position="@RenderPosition.BottomRight" max-traces="5" color-scheme="ColorScheme.Auto" nonce="45" />
+</body>
+</html>
+

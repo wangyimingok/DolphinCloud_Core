@@ -1,0 +1,230 @@
+﻿@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@{
+    Layout = "_PageLayout";
+}
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">菜单列表</div>
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="menuTable" lay-filter="menuTable"></table>
+                    <script type="text/html" id="menuBar">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+                    <script type="text/html" id="menuToolbar">
+                        <div class="layui-btn-container">
+                          <button class="layui-btn layui-btn-sm" lay-event="createMenu">创建菜单</button>
+                        </div>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var element = layui.element,
+        form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        $ = layui.$,
+        laytpl = layui.laytpl;
+    var index = parent.layer.getFrameIndex(window.name);
+    var tableIns = table.render({
+        elem: '#menuTable',
+        url: "@Url.Action("GetMenuTable", "Menu")",
+        method: "POST",
+        contentType: "application/json",
+        headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+        defaultToolbar: ['filter', 'print', 'exports'],
+        toolbar: '#menuToolbar',
+        page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+            layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+        },
+        cols: [[
+            { field: 'menuID', title: '主键', width: 80, sort: true },
+            { field: 'parentID', title: '上级菜单主键', sort: true, align: 'center', hide: true },
+            { field: 'menuName', title: '菜单名称', sort: true, align: 'center' },
+            {
+                field: 'menuType', title: '菜单类型', sort: true, align: 'center', templet: function (d) {
+                    if (d.menuType == '1') {
+                        return '模块';
+                    } else if (d.menuType == '2') {
+                        return '菜单';
+                    } else if (d.menuType == '3') {
+                        return '页面';
+                    } else {
+                        return '功能/按钮';
+                    }
+                }
+            },
+            { field: 'menuIcon', title: '菜单图标', sort: true, align: 'center', templet: function (d) { return '<i class="layui-icon ' + d.menuIcon + '"></i>' } },
+            { field: 'areaName', title: '区域名称', sort: true, align: 'center' },
+            { field: 'controllerName', title: '控制器名称', sort: true, align: 'center' },
+            { field: 'actionName', title: '动作名称', sort: true, align: 'center' },
+            { field: 'menuUrlAddress', title: '链接地址', sort: true, align: 'center' },
+            { field: 'sortNumber', title: '排序', sort: true, align: 'center' },
+            { field: 'createBy', title: '创建人', sort: true, align: 'center' },
+            { field: 'createDateTime', title: '创建时间', sort: true, align: 'center' },
+            { field: 'lastModifyBy', title: '最后修改人', sort: true, align: 'center' },
+            { field: 'lastModifyDate', title: '最后修改时间', sort: true, align: 'center' },
+            { fixed: 'right', title: '操作', sort: true, toolbar: '#menuBar' }
+        ]],
+        response: {
+            //重新规定成功的状态码为 200，table 组件默认为 0
+            statusCode: 200
+        }
+    });
+    //触发单元格工具事件
+    table.on('tool(menuTable)', function (obj) { // 双击 toolDouble
+        var data = obj.data;
+        if (obj.event === 'del') {
+            layer.confirm('真的删除行么', {
+                btn: ['确定', '关闭'] //按钮
+            }, function (index) {
+                obj.del();
+                $.ajax({
+                    url: '@Url.Action("DeleteMenu", "Menu")',
+                    type: 'POST',
+                    dataType: "JSON",
+                    data: JSON.stringify(data),
+                    contentType: "application/json;charset=utf-8",
+                    headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+                    success: function (data) {
+                        if (data.responseCode == 200) {
+                            layer.msg(data.message, { icon: 1, offset: 'auto', time: 2000 }, function () {
+                                //同时关闭上一级弹出层
+                                var index = parent.layer.getFrameIndex(window.name); // 获取当前 iframe 层的索引
+                                parent.layer.close(index); // 关闭当前 iframe 弹层
+                                //回调重新刷新表格
+                                table.reload('menuTable');
+                            });
+                        }
+                        else {
+                            layer.msg(data.message, { icon: 2, offset: 'auto', time: 5000 });
+                        }
+                    },
+                    error: function (data) {
+                        alert(data);
+                        console.log(data);
+                    }
+                });
+                layer.close(index);
+            });
+        } else if (obj.event === 'edit') {
+            layer.open({
+                title: '编辑菜单信息',
+                shadeClose: true,
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                type: 2,
+                area: ['20%', '25%'],
+                content: '@Url.Action("Edit", "Menu")?MenuID=' + data.menuID,
+                btn: ['更新', '关闭'],
+                yes: function (index, layero) {
+                    var iframeWindow = window['layui-layer-iframe' + index];
+                    //获得提交按钮
+                    var submit = layero.find('iframe').contents().find('#btnMenuModifySubmit');
+                    //事件-提交
+                    iframeWindow.layui.form.on('submit(menuModifySubmitFilter)', function (data) {
+                        $.ajax({
+                            url: '@Url.Action("Edit", "Menu")',
+                            type: 'POST',
+                            dataType: "JSON",
+                            data: JSON.stringify(data.field),
+                            contentType: "application/json;charset=utf-8",
+                            headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+                            success: function (data) {
+                                if (data.responseCode == 200) {
+                                    layer.msg(data.message, { icon: 1, offset: 'auto', time: 2000 }, function () {
+                                        //同时关闭上一级弹出层
+                                        var index = parent.layer.getFrameIndex(window.name); // 获取当前 iframe 层的索引
+                                        parent.layer.close(index); // 关闭当前 iframe 弹层
+                                    });
+                                }
+                                else {
+                                    layer.msg(data.message, { icon: 2, offset: 'auto', time: 5000 });
+                                }
+                            },
+                            error: function (data) {
+                                alert(data);
+                                console.log(data);
+                            }
+                        });
+                        layer.close(index); //关闭弹层
+                    });
+                    submit.trigger('click');
+                },
+                end: function () {
+                    //回调重新刷新表格
+                    table.reload('menuTable');
+                }
+            });
+
+        }
+    });
+    // 工具栏事件
+    table.on('toolbar(menuTable)', function (obj) {
+        var id = obj.config.id;
+        var checkStatus = table.checkStatus(id);
+        var othis = lay(this);
+        switch (obj.event) {
+            case 'createMenu':
+                layer.open({
+                    title: '创建菜单',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    type: 2,
+                    area: ['700px', '600px'],
+                    content: '@Url.Action("Create", "Menu")',
+                    btn: ['创建', '关闭'],
+                    yes: function (index, layero) {
+                        var iframeWindow = window['layui-layer-iframe' + index];
+                        //获得提交按钮
+                        var submit = layero.find('iframe').contents().find('#btnMenuSubmit');
+                        //事件-提交
+                        iframeWindow.layui.form.on('submit(menuCreateSubmitFilter)', function (data) {
+                            $.ajax({
+                                url: "@Url.Action("CreateMenu", "Menu")",
+                                type: 'POST',
+                                dataType: "JSON",
+                                data: JSON.stringify(data.field),
+                                contentType: "application/json;charset=utf-8",
+                                headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+                                success: function (data) {
+                                    if (data.responseCode == 200) {
+                                        layer.msg(data.message, { icon: 1, offset: 'auto', time: 2000 }, function () {
+                                            //同时关闭上一级弹出层
+                                            var index = parent.layer.getFrameIndex(window.name); // 获取当前 iframe 层的索引
+                                            table.reload('menuTable'); //数据刷新
+                                            parent.layer.close(index); // 关闭当前 iframe 弹层
+                                        });
+                                    }
+                                    else {
+                                        layer.msg(data.message, { icon: 2, offset: 'auto', time: 5000 });
+                                    }
+                                },
+                                error: function (data) {
+                                    alert(data);
+                                    console.log(data);
+                                }
+                            });
+
+                            layer.close(index); //关闭弹层
+                        });
+                        submit.trigger('click');
+                    }
+                });
+                break;
+        };
+    });
+
+</script>
