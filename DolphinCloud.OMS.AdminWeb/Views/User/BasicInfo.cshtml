@@ -60,7 +60,7 @@
         // 提交事件
         form.on('submit(setmyinfo)', function (data) {
             $.ajax({
-                url: "@Url.Action("UpdateBasicInfo", "User")",
+                url: '@Url.Action("UpdateBasicInfo", "User")',
                 type: 'POST',
                 dataType: "JSON",
                 data: JSON.stringify(data.field),
