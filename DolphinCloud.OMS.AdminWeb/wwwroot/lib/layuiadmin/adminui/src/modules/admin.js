@@ -36,7 +36,7 @@ layui.define('view', function(exports){
 
   // 通用方法
   var admin = {
-    v: '2.5.0',
+    v: '2.5.1',
     mode: 'iframe',
 
     // 数据的异步请求
