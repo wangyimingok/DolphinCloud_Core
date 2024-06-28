@@ -13,7 +13,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
     /// <summary>
     /// 用户信息控制器
     /// </summary>
-    [Authorize(Policy = PermissionPolicy.AdminArea)]
+    [Authorize]
     public class UserController : BaseController
     {
         /// <summary>

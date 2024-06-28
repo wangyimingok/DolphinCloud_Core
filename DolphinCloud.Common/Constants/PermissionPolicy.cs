@@ -20,5 +20,10 @@ namespace DolphinCloud.Common.Constants
         /// 客户端权限
         /// </summary>
         public const string ClientArea = "Client";
+
+        /// <summary>
+        /// 自定义验证策略
+        /// </summary>
+        public const string Customize = "Customize";
     }
 }

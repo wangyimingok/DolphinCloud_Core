@@ -57,5 +57,14 @@ namespace DolphinCloud.DataInterFace.System
         /// <param name="dataModel"></param>
         /// <returns></returns>
         Task<OperationMessage> ConfigPermissionByRoleAsync(RoleAuthorDataModel dataModel);
+
+        /// <summary>
+        /// 权限校验
+        /// </summary>
+        /// <param name="ControllerName">传入参数 <see cref="string"/>类型 请求访问的控制器名称</param>
+        /// <param name="ActionName">传入参数 <see cref="string"/>类型 请求访问的Action名称</param>
+        /// <param name="requestUrlAddress">传入参数 <see cref="string"/>类型 请求访问的URL地址</param>
+        /// <returns>返回值 <see cref="bool"/>类型 true:有权限访问 false:无权限访问</returns>
+        Task<bool> CheckPermissionAsync(string ControllerName, string ActionName, string requestUrlAddress = null);
     }
 }

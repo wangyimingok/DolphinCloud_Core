@@ -36,13 +36,19 @@ namespace DolphinCloud.DataServices.System
         /// 角色权限数据仓储
         /// </summary>
         private readonly RoleAuthorityRepository _roleAuthority;
-        public RoleDataService(ILogger<RoleDataService> logger, IMapper mapper, RoleRepository roleRepository, ICurrentUserInfo currentUserInfo, RoleAuthorityRepository roleAuthorityRepository)
+
+        /// <summary>
+        /// 用户角色关系数据仓储
+        /// </summary>
+        private readonly UserRoleRelationRepository _relationRepository;
+        public RoleDataService(ILogger<RoleDataService> logger, IMapper mapper, RoleRepository roleRepository, ICurrentUserInfo currentUserInfo, RoleAuthorityRepository roleAuthorityRepository, UserRoleRelationRepository userRoleRelationRepository)
         {
             _logger = logger;
             _mapper = mapper;
             _roleRepo = roleRepository;
             _currentUser = currentUserInfo;
             _roleAuthority = roleAuthorityRepository;
+            _relationRepository = userRoleRelationRepository;
         }
 
 
@@ -242,6 +248,61 @@ namespace DolphinCloud.DataServices.System
             {
                 _logger.LogError(ex, $"为角色【{dataModel.RoleName}】配置权限异常,异常原因为:【{ex.Message}】");
                 return new OperationMessage(ResponseCode.ServerError, $"授权失败");
+            }
+        }
+
+        /// <summary>
+        /// 权限校验
+        /// </summary>
+        /// <param name="ControllerName">传入参数 <see cref="string"/>类型 请求访问的控制器名称</param>
+        /// <param name="ActionName">传入参数 <see cref="string"/>类型 请求访问的Action名称</param>
+        /// <param name="requestUrlAddress">传入参数 <see cref="string"/>类型 请求访问的URL地址</param>
+        /// <returns>返回值 <see cref="bool"/>类型 true:有权限访问 false:无权限访问</returns>
+        public async Task<bool> CheckPermissionAsync(string ControllerName, string ActionName, string requestUrlAddress = null)
+        {
+            try
+            {
+                var currentUserPermissionList = await _roleRepo.Orm.Select<MenuInfo, RoleAuthorityInfo, RoleInfo, UserRoleRelationInfo, UserInfo>()
+                      .InnerJoin((menu, roleAuthor, role, userRoleRelation, user) => menu.MenuID == roleAuthor.MenuID && !menu.DeleteFG)
+                      .InnerJoin((menu, roleAuthor, role, userRoleRelation, user) => roleAuthor.RoleID == role.RoleID && !roleAuthor.DeleteFG)
+                      .InnerJoin((menu, roleAuthor, role, userRoleRelation, user) => role.RoleID == userRoleRelation.RoleID && !role.DeleteFG)
+                      .InnerJoin((menu, roleAuthor, role, userRoleRelation, user) => userRoleRelation.UserID == user.UserID && !userRoleRelation.DeleteFG)
+                      .Where((menu, roleAuthor, role, userRoleRelation, user) => user.UserID == _currentUser.UserID && !user.DeleteFG)
+                      .ToListAsync((menu, roleAuthor, role, userRoleRelation, user) => new AuthenticationDataModel
+                      {
+                          RoleID = role.RoleID,
+                          MenuID = menu.MenuID,
+                          MenuUrlAddress = menu.MenuUrlAddress,
+                          UserID = user.UserID,
+                          UserName = user.UserName,
+                          RoleName = role.RoleName,
+                          ActionName = menu.ActionName,
+                          ControllerName = menu.ControllerName,
+                          AreaName = menu.AreaName,
+                          MenuName = menu.MenuName,
+                          MenuType = menu.MenuType,
+                          RealName = user.RealName
+                      });
+                if (!string.IsNullOrWhiteSpace(ControllerName) && !string.IsNullOrWhiteSpace(ActionName))
+                {
+                    var isHaveAccess = currentUserPermissionList.Any(a => a.ControllerName == ControllerName && a.ActionName == ActionName);
+                    return isHaveAccess;
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(requestUrlAddress))
+                    {
+                        var isHaveAccess = currentUserPermissionList.Any(a => a.MenuUrlAddress == requestUrlAddress);
+                        return isHaveAccess;
+                    }
+                    _logger.LogWarning($"权限判断时,验证请求地址为空【{requestUrlAddress}】");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"权限校验异常,异常原因为:【{ex.Message}】");
+                return false;
             }
         }
 

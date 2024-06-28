@@ -12,7 +12,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
     /// <summary>
     /// 菜单控制器
     /// </summary>
-    [Authorize(Policy = PermissionPolicy.AdminArea)]
+    [Authorize]
     public class MenuController : BaseController
     {
         private readonly ILogger<MenuController> _logger;

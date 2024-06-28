@@ -12,7 +12,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
     /// <summary>
     /// 角色控制器
     /// </summary>
-    [Authorize(Policy = PermissionPolicy.AdminArea)]
+    [Authorize]
     public class RoleController : BaseController
     {
         private readonly IRoleDataInterFace _roleData;

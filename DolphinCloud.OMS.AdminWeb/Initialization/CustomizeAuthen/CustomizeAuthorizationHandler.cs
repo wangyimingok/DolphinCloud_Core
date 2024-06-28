@@ -18,10 +18,13 @@ namespace DolphinCloud.OMS.AdminWeb.Initialization.CustomizeAuthen
         /// 用户信息接口
         /// </summary>
         private readonly IUserDataInterFace _userData;
-        public CustomizeAuthorizationHandler(ILogger<CustomizeAuthorizationHandler> logger, IUserDataInterFace userDataInter)
+
+        private readonly IRoleDataInterFace _roleData;
+        public CustomizeAuthorizationHandler(ILogger<CustomizeAuthorizationHandler> logger, IUserDataInterFace userDataInter, IRoleDataInterFace roleData)
         {
             _logger = logger;
             _userData = userDataInter;
+            _roleData = roleData;
         }
         /// <summary>
         /// 处理鉴权
@@ -30,36 +33,51 @@ namespace DolphinCloud.OMS.AdminWeb.Initialization.CustomizeAuthen
         /// <param name="requirement"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, CustomizeRequirement requirement)
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CustomizeRequirement requirement)
         {
+            //context.
             if (context.User.Identity.IsAuthenticated)
             {
-                var UserID = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var UserName = context.User.FindFirst(ClaimTypes.Name)?.Value;
-                var EMail = context.User.FindFirst(ClaimTypes.Email)?.Value;
-                var MobilePhone = context.User.FindFirst(ClaimTypes.MobilePhone)?.Value;
-                //验证客户端区域权限配置
-                if (requirement.RequirementName == PermissionPolicy.ClientArea)
+                if (context.Resource != null)
                 {
-                    if (UserName.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                    HttpContext httpContext = (HttpContext)context.Resource;
+                    if (httpContext != null)
                     {
-                        context.Succeed(requirement);
+                        var UserID = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                        var UserName = context.User.FindFirst(ClaimTypes.Name)?.Value;
+                        string urlAddress = httpContext.Request.Path.Value;
+                        var routeData = httpContext.GetRouteData();
+                        var controllerName = httpContext.GetRouteValue("controller") + string.Empty;
+                        var actionName = httpContext.GetRouteValue("action") + string.Empty;
+                        var checkedResult = await _roleData.CheckPermissionAsync(controllerName, actionName, urlAddress);
+                        if (checkedResult)
+                        {
+                            context.Succeed(requirement);
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"用户【{UserName}】,用户ID【{UserID}】访问【{controllerName}/{actionName}】权限校验不通过");
+                            context.Fail();
+                        }
                     }
-                }
-                else if (requirement.RequirementName == PermissionPolicy.AdminArea)
-                {
-                    if (UserName.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                    else
                     {
-                        context.Succeed(requirement);
+                        _logger.LogWarning($"权限校验不通过,【httpContext】为空!");
+                        context.Fail();
                     }
                 }
                 else
                 {
+                    _logger.LogWarning($"权限校验不通过,【context.Resource】为空!");
                     context.Fail();
                 }
             }
-
-            return Task.CompletedTask;
+            else
+            {
+                _logger.LogWarning($"权限校验不通过,用户未登录!");
+                context.Fail();
+                //context.
+            }
         }
     }
 }

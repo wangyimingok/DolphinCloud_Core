@@ -92,9 +92,9 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 //app.UseMiddleware<InitSystemDataMiddleware>();
 app.UseRouting();
-//启用权限验证
+//启用认证
 app.UseAuthentication();
-//身份验证
+//授权
 app.UseAuthorization();
 //启用性能监测
 app.UseMiniProfiler();
