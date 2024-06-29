@@ -36,12 +36,15 @@ namespace DolphinCloud.DataServices.System
         /// 角色权限数据仓储
         /// </summary>
         private readonly RoleAuthorityRepository _roleAuthority;
-
+        /// <summary>
+        /// 菜单数据仓储
+        /// </summary>
+        private readonly MenuRepository _munuRepo;
         /// <summary>
         /// 用户角色关系数据仓储
         /// </summary>
         private readonly UserRoleRelationRepository _relationRepository;
-        public RoleDataService(ILogger<RoleDataService> logger, IMapper mapper, RoleRepository roleRepository, ICurrentUserInfo currentUserInfo, RoleAuthorityRepository roleAuthorityRepository, UserRoleRelationRepository userRoleRelationRepository)
+        public RoleDataService(ILogger<RoleDataService> logger, IMapper mapper, RoleRepository roleRepository, ICurrentUserInfo currentUserInfo, RoleAuthorityRepository roleAuthorityRepository, UserRoleRelationRepository userRoleRelationRepository, MenuRepository menuRepository)
         {
             _logger = logger;
             _mapper = mapper;
@@ -49,6 +52,7 @@ namespace DolphinCloud.DataServices.System
             _currentUser = currentUserInfo;
             _roleAuthority = roleAuthorityRepository;
             _relationRepository = userRoleRelationRepository;
+            _munuRepo= menuRepository;
         }
 
 
@@ -327,6 +331,44 @@ namespace DolphinCloud.DataServices.System
                 }
             }
             return dataList;
+        }
+
+        /// <summary>
+        /// 获取角色列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ResultMessage<List<LayuiTreeDataModel>>> GetRoleListAsync()
+        {
+            try
+            {
+                var dataModelList = await _roleRepo.Where(a => !a.DeleteFG).ToListAsync(a => new LayuiTreeDataModel {  TreeID = a.RoleID,  NodeName = a.RoleName });
+                return new ResultMessage<List<LayuiTreeDataModel>>(ResponseCode.OperationSuccess, "获取角色列表成功", dataModelList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"获取角色列表异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<List<LayuiTreeDataModel>>(ResponseCode.ServerError, "获取角色列表失败");
+            }
+        }
+
+        /// <summary>
+        /// 获得当前角色已经拥有的权限
+        /// </summary>
+        /// <param name="RoleID"></param>
+        /// <returns></returns>
+        public async Task<ResultMessage<List<int>>> GetCurrentRoleAlreadyPermissionAsync(int RoleID)
+        {
+            try
+            {
+              var DataList=await  _roleAuthority.Where(a=>a.RoleID== RoleID).ToListAsync();
+              var treeData = DataList.Select(a => a.MenuID).ToList();
+                return new ResultMessage<List<int>>(ResponseCode.OperationSuccess, "获取角色已有权限成功", treeData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"获取角色已有权限异常,异常原因为:【{ex.Message}】");
+               return new ResultMessage<List<int>>(ResponseCode.ServerError, "获取角色已有权限失败");
+            }
         }
     }
 }

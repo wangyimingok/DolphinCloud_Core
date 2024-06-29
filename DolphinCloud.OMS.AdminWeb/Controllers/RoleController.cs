@@ -15,6 +15,9 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
     [Authorize]
     public class RoleController : BaseController
     {
+        /// <summary>
+        /// 角色数据接口
+        /// </summary>
         private readonly IRoleDataInterFace _roleData;
         public RoleController(IRoleDataInterFace roleDataInterFace)
         {
@@ -132,6 +135,18 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         {
             var result = await _roleData.ConfigPermissionByRoleAsync(dataModel);
             return new JsonResult(new OperationMessage(ResponseCode.OperationSuccess, "授权成功"));
+        }
+
+        /// <summary>
+        /// 获得当前角色已有的权限
+        /// </summary>
+        /// <param name="RoleID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<JsonResult> GetCurrentRoleAlreadyPermission(int RoleID)
+        {
+            var result= await _roleData.GetCurrentRoleAlreadyPermissionAsync(RoleID);
+            return new JsonResult(result);
         }
     }
 }

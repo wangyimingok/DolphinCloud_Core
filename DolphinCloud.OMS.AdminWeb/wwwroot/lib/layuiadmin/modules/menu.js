@@ -1,48 +1,20 @@
-﻿@functions {
-    public string GetAntiXsrfRequestToken()
-    {
-        return Xsrf.GetAndStoreTokens(Context).RequestToken;
-    }
-}
-@{
-    Layout = "_PageLayout";
-}
-<div class="layui-fluid">
-    <div class="layui-row layui-col-space15">
-        <div class="layui-col-md12">
-            <div class="layui-card">
-                <div class="layui-card-header">菜单列表</div>
-                <div class="layui-card-body">
-                    <table class="layui-hide" id="menuTable" lay-filter="menuTable"></table>
-                    <script type="text/html" id="menuBar">
-                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-                    </script>
-                    <script type="text/html" id="menuToolbar">
-                        <div class="layui-btn-container">
-                          <button class="layui-btn layui-btn-sm" lay-event="createMenu">创建菜单</button>
-                        </div>
-                    </script>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+﻿/**
+ * 自定义菜单模块
+ * 
+ */
+layui.define(['jquery', 'table'], function (exports) {
 
-<script type="text/javascript">
-    var element = layui.element,
-        form = layui.form,
-        layer = layui.layer,
-        table = layui.table,
-        $ = layui.$,
-        laytpl = layui.laytpl;
+    var $ = layui.$,
+        table = layui.table;
+
     var index = parent.layer.getFrameIndex(window.name);
     var tableIns = table.render({
         elem: '#menuTable',
-        url: "@Url.Action("GetMenuTable", "Menu")",
+        //url: "@Url.Action("GetMenuTable", "Menu")",
+        url:'/Menu/GetMenuTable',
         method: "POST",
         contentType: "application/json",
-        headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+        headers: { 'X-CSRF-TOKEN': $('#RequestVerificationToken').val() },
         defaultToolbar: ['filter', 'print', 'exports'],
         toolbar: '#menuToolbar',
         page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
@@ -91,12 +63,13 @@
             }, function (index) {
                 obj.del();
                 $.ajax({
-                    url: '@Url.Action("DeleteMenu", "Menu")',
+                    //url: '@Url.Action("DeleteMenu", "Menu")',
+                    url:'Menu/DeleteMenu',
                     type: 'POST',
                     dataType: "JSON",
                     data: JSON.stringify(data),
                     contentType: "application/json;charset=utf-8",
-                    headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+                    headers: { 'X-CSRF-TOKEN': $('#RequestVerificationToken').val() },
                     success: function (data) {
                         if (data.responseCode == 200) {
                             layer.msg(data.message, { icon: 1, offset: 'auto', time: 2000 }, function () {
@@ -126,7 +99,8 @@
                 maxmin: true, //开启最大化最小化按钮
                 type: 2,
                 area: ['20%', '25%'],
-                content: '@Url.Action("Edit", "Menu")?MenuID=' + data.menuID,
+                //content: '@Url.Action("Edit", "Menu")?MenuID=' + data.menuID,
+                content: '/Menu/Edit?MenuID=' + data.menuID,
                 btn: ['更新', '关闭'],
                 yes: function (index, layero) {
                     var iframeWindow = window['layui-layer-iframe' + index];
@@ -135,12 +109,13 @@
                     //事件-提交
                     iframeWindow.layui.form.on('submit(menuModifySubmitFilter)', function (data) {
                         $.ajax({
-                            url: '@Url.Action("Edit", "Menu")',
+                            //url: '@Url.Action("Edit", "Menu")',
+                            url:'/Menu/Edit',
                             type: 'POST',
                             dataType: "JSON",
                             data: JSON.stringify(data.field),
                             contentType: "application/json;charset=utf-8",
-                            headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+                            headers: { 'X-CSRF-TOKEN': $('#RequestVerificationToken').val() },
                             success: function (data) {
                                 if (data.responseCode == 200) {
                                     layer.msg(data.message, { icon: 1, offset: 'auto', time: 2000 }, function () {
@@ -184,7 +159,8 @@
                     maxmin: true, //开启最大化最小化按钮
                     type: 2,
                     area: ['700px', '600px'],
-                    content: '@Url.Action("Create", "Menu")',
+                    //content: '@Url.Action("Create", "Menu")',
+                    content: '/Menu/Create',
                     btn: ['创建', '关闭'],
                     yes: function (index, layero) {
                         var iframeWindow = window['layui-layer-iframe' + index];
@@ -192,15 +168,14 @@
                         var submit = layero.find('iframe').contents().find('#btnMenuSubmit');
                         //事件-提交
                         iframeWindow.layui.form.on('submit(menuCreateSubmitFilter)', function (data) {
-                            console.log(data);
-                            console.log(data.field);
                             $.ajax({
-                                url: "@Url.Action("CreateMenu", "Menu")",
+                                //url: "@Url.Action("CreateMenu", "Menu")",
+                                url:'/Menu/CreateMenu',
                                 type: 'POST',
                                 dataType: "JSON",
                                 data: JSON.stringify(data.field),
                                 contentType: "application/json;charset=utf-8",
-                                headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+                                headers: { "X-CSRF-TOKEN": $('#RequestVerificationToken').val() },
                                 success: function (data) {
                                     if (data.responseCode == 200) {
                                         layer.msg(data.message, { icon: 1, offset: 'auto', time: 2000 }, function () {
@@ -228,5 +203,6 @@
                 break;
         };
     });
-
-</script>
+    //对外暴露的接口
+    exports('menu', {});
+});

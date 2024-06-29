@@ -3,6 +3,7 @@ using DolphinCloud.Common.Constants;
 using DolphinCloud.Common.Enums;
 using DolphinCloud.Common.Result;
 using DolphinCloud.DataInterFace.System;
+using DolphinCloud.DataModel.System.Role;
 using DolphinCloud.DataModel.System.User;
 using DolphinCloud.Framework.Session;
 using Microsoft.AspNetCore.Authorization;
@@ -24,10 +25,16 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// 当前用户信息
         /// </summary>
         private readonly ICurrentUserInfo _currentUser;
-        public UserController(IUserDataInterFace userDataInterFace, ICurrentUserInfo currentUserInfo)
+
+        /// <summary>
+        /// 角色数据接口
+        /// </summary>
+        private readonly IRoleDataInterFace _roleData;
+        public UserController(IUserDataInterFace userDataInterFace, ICurrentUserInfo currentUserInfo, IRoleDataInterFace roleDataInterFace)
         {
             _user = userDataInterFace;
             _currentUser = currentUserInfo;
+            _roleData = roleDataInterFace;
         }
         /// <summary>
         /// 用户信息首页
@@ -229,6 +236,65 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         {
             var result = await _user.UpdateUserBasicInfoDataAsync(dataModel);
             return Json(result);
+        }
+
+        /// <summary>
+        /// 配置角色
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> ConfigurationRole(long UserID)
+        {
+            var result = await _user.GetUserRoleRelationDataModelByUserIDAsync(UserID);
+            if (result.Code == ResponseCode.OperationSuccess)
+            {
+                var UserRoleRelationDataModel = result.Data;
+                return View(UserRoleRelationDataModel);
+            }
+            return await Task.FromResult(View());
+        }
+        /// <summary>
+        /// 为用户配置角色
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<JsonResult> ConfigurationRole([FromBody] UserRoleRelationDataModel dataModel)
+        {
+            var result = await _user.GiveUserConfigRoleAsync(dataModel);
+            if (result.Code == ResponseCode.OperationSuccess)
+            {
+                return new JsonResult(new OperationMessage(ResponseCode.OperationSuccess, "授权成功"));
+            }
+            else
+            {
+                return new JsonResult(new OperationMessage(ResponseCode.OperationWarning, "授权失败"));
+            }
+
+        }
+
+        /// <summary>
+        /// 获得角色列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<JsonResult> GetRoleList()
+        {
+            var result = await _roleData.GetRoleListAsync();
+            return Json(result);
+        }
+
+        /// <summary>
+        /// 获得当前用户已有的角色
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<JsonResult> GetCurrentUserAlreadyRole(long UserID)
+        {
+            var result = await _user.GetCurrentUserAlreadyRole(UserID);
+            return new JsonResult(result);
         }
     }
 }

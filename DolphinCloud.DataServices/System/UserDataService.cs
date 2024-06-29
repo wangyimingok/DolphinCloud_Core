@@ -6,6 +6,8 @@ using DolphinCloud.Common.Snowflake;
 using DolphinCloud.DataEntity.System;
 using DolphinCloud.DataInterFace.System;
 using DolphinCloud.DataModel.Account;
+using DolphinCloud.DataModel.Base;
+using DolphinCloud.DataModel.System.Role;
 using DolphinCloud.DataModel.System.User;
 using DolphinCloud.Framework.Session;
 using DolphinCloud.Repository.System;
@@ -31,15 +33,21 @@ namespace DolphinCloud.DataServices.System
         /// 用户数据仓储
         /// </summary>
         private readonly UserRepository _userRepo;
-
+        /// <summary>
+        /// 当前用户信息
+        /// </summary>
         private readonly ICurrentUserInfo _currentUser;
-
-        public UserDataService(ILogger<UserDataService> logger, IMapper mapper, UserRepository userRepository, ICurrentUserInfo currentUserInfo)
+        /// <summary>
+        /// 用户角色关系仓储
+        /// </summary>
+        private readonly UserRoleRelationRepository _userRoleRelationRepo;
+        public UserDataService(ILogger<UserDataService> logger, IMapper mapper, UserRepository userRepository, ICurrentUserInfo currentUserInfo, UserRoleRelationRepository userRoleRelationRepository)
         {
             _logger = logger;
             _mapper = mapper;
             _userRepo = userRepository;
             _currentUser = currentUserInfo;
+            _userRoleRelationRepo = userRoleRelationRepository;
         }
 
         /// <summary>
@@ -365,8 +373,8 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var oldPassword= SecurityUtil.MD5_HexConvert(SecurityUtil.Base64Encode(resetPassword.OldPassWord));
-                if (!await _userRepo.Where(a=>a.UserID==resetPassword.UserID&&a.PassWord== oldPassword).AnyAsync())
+                var oldPassword = SecurityUtil.MD5_HexConvert(SecurityUtil.Base64Encode(resetPassword.OldPassWord));
+                if (!await _userRepo.Where(a => a.UserID == resetPassword.UserID && a.PassWord == oldPassword).AnyAsync())
                 {
                     return new OperationMessage(ResponseCode.OperationWarning, "原密码错误");
                 }
@@ -376,8 +384,8 @@ namespace DolphinCloud.DataServices.System
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,$"修改密码操作异常,异常原因为:【{ex.Message}】");
-               return new OperationMessage(ResponseCode.ServerError, $"修改密码失败");
+                _logger.LogError(ex, $"修改密码操作异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"修改密码失败");
             }
         }
 
@@ -390,13 +398,13 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var dataModel=await _userRepo.Select.Where(a => a.UserID == UserID).ToOneAsync(a=>new ResetPasswordDataModel { UserID=a.UserID, UserName=a.UserName });
+                var dataModel = await _userRepo.Select.Where(a => a.UserID == UserID).ToOneAsync(a => new ResetPasswordDataModel { UserID = a.UserID, UserName = a.UserName });
                 return new ResultMessage<ResetPasswordDataModel>(ResponseCode.OperationSuccess, "查询成功", dataModel);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,$"根据用户ID获得用户修改密码数据模型异常,异常原因为:【{ex.Message}】");
-               return new ResultMessage<ResetPasswordDataModel>(ResponseCode.ServerError, $"根据用户ID获得用户修改密码数据模型异常,异常原因为:【{ex.Message}】");
+                _logger.LogError(ex, $"根据用户ID获得用户修改密码数据模型异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<ResetPasswordDataModel>(ResponseCode.ServerError, $"根据用户ID获得用户修改密码数据模型异常,异常原因为:【{ex.Message}】");
             }
         }
 
@@ -457,6 +465,120 @@ namespace DolphinCloud.DataServices.System
             {
                 _logger.LogError(ex, $"更新用户基本信息异常,异常原因为:【{ex.Message}】");
                 return new OperationMessage(ResponseCode.ServerError, $"更新用户基本信息异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 获取用户角色关系数据模型
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        public async Task<ResultMessage<UserRoleRelationDataModel>> GetUserRoleRelationDataModelByUserIDAsync(long UserID)
+        {
+            try
+            {
+                var userDataModel = await _userRepo.Where(a => a.UserID == UserID && a.DeleteFG == false).ToOneAsync(a => new UserRoleRelationDataModel { UserID = a.UserID, UserName = a.UserName });
+                if (userDataModel != null)
+                {
+                    var roleList = await _userRepo.Orm.Select<UserRoleRelationInfo, RoleInfo>()
+                        .InnerJoin((relation, role) => relation.RoleID == role.RoleID && relation.UserID == UserID)
+                        .ToListAsync((relation, role) => new LayuiTreeDataModel { TreeID = role.RoleID, NodeName = role.RoleName });
+                    if (roleList.Any())
+                    {
+                        userDataModel.currentAlreadyRoleList = roleList;
+                    }
+                }
+                return new ResultMessage<UserRoleRelationDataModel>(ResponseCode.OperationSuccess, "查询成功", userDataModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"获取用户角色关系数据模型异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<UserRoleRelationDataModel>(ResponseCode.ServerError, $"获取用户角色关系数据模型异常,异常原因为:【{ex.Message}】");
+            }
+        }
+
+        /// <summary>
+        /// 为用户配置角色
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        public async Task<OperationMessage> GiveUserConfigRoleAsync(UserRoleRelationDataModel dataModel)
+        {
+            try
+            {
+                List<UserRoleRelationInfo> newRoleList = new List<UserRoleRelationInfo>();
+                if (dataModel != null && dataModel.UserID > 0)
+                {
+
+                    var oldRoleList = await _userRoleRelationRepo.Select.Where(a => a.UserID == dataModel.UserID).ToListAsync();
+                    //_userRoleRelationRepo
+                    foreach (var item in dataModel.currentAlreadyRoleList)
+                    {
+                        UserRoleRelationInfo userRoleRelationInfo = new UserRoleRelationInfo();
+                        userRoleRelationInfo.UserID = dataModel.UserID;
+                        userRoleRelationInfo.RoleID = item.TreeID;
+                        if (string.IsNullOrEmpty(_currentUser.UserName))
+                        {
+                            userRoleRelationInfo.CreateBy = "System";
+                        }
+                        else
+                        {
+                            userRoleRelationInfo.CreateBy = _currentUser.UserName;
+                        }
+                        userRoleRelationInfo.CreateDateTime = DateTimeOffset.Now;
+                        userRoleRelationInfo.LastModifyBy = "System";
+                        userRoleRelationInfo.LastModifyDate = DateTimeOffset.Now;
+                        newRoleList.Add(userRoleRelationInfo);
+                    }
+                    using (var uow = _userRoleRelationRepo.Orm.CreateUnitOfWork())
+                    {
+                        _userRoleRelationRepo.UnitOfWork = uow;
+                        if (newRoleList.Any())
+                        {
+                            await _userRoleRelationRepo.InsertAsync(newRoleList);
+                        }
+                        if (oldRoleList.Any())
+                        {
+                            await _userRoleRelationRepo.DeleteAsync(oldRoleList);
+                        }
+                        uow.Commit();
+                        return new OperationMessage(ResponseCode.OperationSuccess, "用户角色配置成功");
+                    }
+                }
+                else if (dataModel.currentAlreadyRoleList.Any())
+                {
+                    await _userRoleRelationRepo.Where(a => a.UserID == dataModel.UserID).ToDelete().ExecuteAffrowsAsync();
+                    return new OperationMessage(ResponseCode.OperationSuccess, "用户角色配置成功");
+                }
+                else
+                {
+                    return new OperationMessage(ResponseCode.OperationWarning, "参数错误");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"为用户【{dataModel.UserName}】配置角色异常,异常原因为:【{ex.Message}】");
+                return new OperationMessage(ResponseCode.ServerError, $"为用户【{dataModel.UserName}】配置角色失败");
+            }
+        }
+
+        /// <summary>
+        /// 获取当前用户已经拥有的角色
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResultMessage<List<int>>> GetCurrentUserAlreadyRole(long UserID)
+        {
+            try
+            {
+              var roleDataList=await  _userRoleRelationRepo.Where(a=>a.UserID==UserID).ToListAsync(a=>a.RoleID);
+                return new ResultMessage<List<int>>(ResponseCode.OperationSuccess, "查询成功", roleDataList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,$"获取当前用户已经拥有的角色异常,异常原因为:【{ex.Message}】");
+                return new ResultMessage<List<int>>(ResponseCode.ServerError, "获取当前用户已经拥有的角色查询失败");
             }
         }
     }

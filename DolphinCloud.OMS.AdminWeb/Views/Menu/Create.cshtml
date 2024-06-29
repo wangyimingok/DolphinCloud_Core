@@ -50,7 +50,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">排序值</label>
                     <div class="layui-input-block">
-                        <input type="number" asp-for="SortNumber" placeholder="排序值" autocomplete="off" class="layui-input">
+                        <input type="number" asp-for="SortNumber" value="0" placeholder="排序值" autocomplete="off" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -97,16 +97,6 @@
             // 渲染成功后的回调
             success: function (d) {
                 console.log(d);
-            }
-        });
-        // 自定义验证规则
-        form.verify({
-            // 确认密码
-            confirmPassword: function (value, item) {
-                var passwordValue = $('#userPasswrod').val();
-                if (value !== passwordValue) {
-                    return '两次密码输入不一致';
-                }
             }
         });
 

@@ -17,7 +17,8 @@ namespace DolphinCloud.AutoMapper.System
         public RoleMapperProfile()
         {
             CreateMap<RoleDataViewModel, RoleInfo>().ReverseMap();
-            CreateMap<RoleCreateDataModel, RoleInfo>().ReverseMap();
+            CreateMap<RoleCheckBoxDataModel, RoleInfo>().ReverseMap();
+            CreateMap<RoleCreateDataModel, RoleInfo>().ReverseMap(); 
             CreateMap<RoleModifyDataModel, RoleInfo>().ReverseMap();
             CreateMap<RolePagination, RoleInfo>().ReverseMap();
             CreateMap<RoleAuthorDataModel, RoleInfo>().ReverseMap();

@@ -4,38 +4,28 @@
         return Xsrf.GetAndStoreTokens(Context).RequestToken;
     }
 }
-@model DolphinCloud.DataModel.System.Role.RoleAuthorDataModel
+@model DolphinCloud.DataModel.System.User.UserRoleRelationDataModel
 <div class="layui-card">
-    <div class="layui-card-header">角色权限配置</div>
+    <div class="layui-card-header">用户角色配置</div>
     <div class="layui-card-body">
         <div class="layui-form-item">
             <label class="layui-form-label">角色</label>
             <div class="layui-input-block">
-                <p><strong class="layui-form-label" id="RoleName">@Model.RoleName</strong></p>
-                <input type="hidden" asp-for="RoleID" />
+                <p><strong class="layui-form-label" id="UserName">@Model.UserName</strong></p>
+                <input type="hidden" asp-for="UserID" />
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">权限范围</label>
+            <label class="layui-form-label">选择角色</label>
             <div class="layui-input-block">
-                <div id="treePermission"></div>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">具体描述</label>
-            <div class="layui-input-block">
-                <textarea type="text" name="descr" lay-verify="required" autocomplete="off" class="layui-textarea"></textarea>
+                <div id="treeRoleList"></div>
             </div>
         </div>
         <div class="layui-form-item layui-hide">
-            <button class="layui-btn" lay-submit lay-filter="roleAuthorSubmit" id="btnroleAuthorSubmit">提交</button>
+            <button class="layui-btn" lay-submit lay-filter="roleConfigSubmit" id="btnRoleConfigSubmit">提交</button>
         </div>
     </div>
 </div>
-
-
-@* <button class="layui-btn layuiadmin-btn-forum-list" id="btnTest" data-type="batchdel">测试</button> *@
-
 <script type="text/javascript">
     layui.use(function () {
         var tree = layui.tree;
@@ -43,18 +33,19 @@
         var util = layui.util;
         var $ = layui.$;
         $.ajax({
-            url: "@Url.Action("GetPermissionTreeData", "Menu")",
+            url: "@Url.Action("GetRoleList", "User")",
             type: 'GET',
             success: function (data) {
                 if (data.responseCode == 200) {
                     console.log(data);
                     tree.render({
-                        elem: '#treePermission',
+                        elem: '#treeRoleList',
                         data: data.data,
                         showCheckbox: true,  // 是否显示复选框
                         onlyIconControl: true,  // 是否仅允许节点左侧图标控制展开收缩
-                        id: 'permissionTree'
+                        id: 'roleTree'
                     });
+                    layui.form.render("select");
                 }
             },
             error: function (data) {
@@ -62,15 +53,14 @@
                 console.log(data);
             }
         });
-       
-        //var treeData=
+
         // 渲染
         util.event('lay-filter', {
-            roleAuthorSubmit: function () {
-                var checkedData = tree.getChecked('permissionTree');
-                var JsonData = { roleID: $("#RoleID").val(), roleName: $("#RoleName").text(), Permissions: checkedData };
+            roleConfigSubmit: function () {
+                var checkedData = tree.getChecked('roleTree');
+                var JsonData = { userID: $("#UserID").val(), userName: $("#UserName").text(), currentAlreadyRoleList: checkedData };
                 $.ajax({
-                    url: "@Url.Action("Authorization", "Role")",
+                    url: "@Url.Action("ConfigurationRole", "User")",
                     type: 'POST',
                     dataType: "JSON",
                     data: JSON.stringify(JsonData),
@@ -97,11 +87,11 @@
             }
         });
         $.ajax({
-            url: "@Url.Action("GetCurrentRoleAlreadyPermission", "Role")?RoleID=" + $("#RoleID").val(),
+            url: "@Url.Action("GetCurrentUserAlreadyRole", "User")?UserID=" + $("#UserID").val(),
             type: 'GET',
             success: function (data) {
                 if (data.responseCode == 200) {
-                    tree.setChecked('permissionTree', data.data); // 勾选对应 id 值的节点
+                    tree.setChecked('roleTree', data.data); // 勾选对应 id 值的节点
                 }
             },
             error: function (data) {

@@ -113,5 +113,26 @@ namespace DolphinCloud.DataInterFace.System
         /// <returns></returns>
         Task<OperationMessage> UpdateUserBasicInfoDataAsync(BasicInfoDataModel dataModel);
 
+        /// <summary>
+        /// 获取用户角色关系数据模型
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        Task<ResultMessage<UserRoleRelationDataModel>> GetUserRoleRelationDataModelByUserIDAsync(long UserID);
+
+        /// <summary>
+        /// 为用户配置角色
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
+        Task<OperationMessage> GiveUserConfigRoleAsync(UserRoleRelationDataModel dataModel);
+
+        /// <summary>
+        /// 获得当前用户已经拥有的角色
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        Task<ResultMessage<List<int>>> GetCurrentUserAlreadyRole(long UserID);
+
     }
 }

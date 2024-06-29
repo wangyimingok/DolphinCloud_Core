@@ -31,7 +31,9 @@ namespace DolphinCloud.DataServices.System
         /// 菜单数据仓储
         /// </summary>
         private readonly MenuRepository _munuRepo;
-
+        /// <summary>
+        /// 当前用户信息
+        /// </summary>
         private readonly ICurrentUserInfo _currentUser;
         public MenuDataService(ILogger<MenuDataService> logger, IMapper mapper, MenuRepository menuRepository, ICurrentUserInfo currentUserInfo)
         {
@@ -152,12 +154,24 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var MenuList = await _munuRepo.Select
-                    .Where(a => a.MenuType <= 2 && a.DeleteFG == false)
-                    .WhereIf(!string.IsNullOrWhiteSpace(AreaName), a => a.AreaName == AreaName)
-                    .ToTreeListAsync();
-                var DataModel = _mapper.Map<List<MenuInfo>, List<SideBarNavDataModel>>(MenuList);
-                return DataModel;
+                if (_currentUser.UserID > 0)
+                {
+                    var menuIdList = await _munuRepo.Orm.Select<RoleAuthorityInfo, UserRoleRelationInfo>()
+                          .InnerJoin((roleAuthority, userRoleRelation) => userRoleRelation.RoleID == roleAuthority.RoleID && userRoleRelation.UserID == _currentUser.UserID)
+                          .ToListAsync((roleAuthority, userRoleRelation) => roleAuthority.MenuID);
+                    var currentMenuList = _munuRepo.Select.Where(a => menuIdList.Contains(a.MenuID)).ToTreeListAsync();
+                    var DataModel = _mapper.Map<List<MenuInfo>, List<SideBarNavDataModel>>(currentMenuList.Result);
+                    return DataModel;
+                }
+                else
+                {
+                    var MenuList = await _munuRepo.Select
+                   .Where(a => a.MenuType <= 2 && a.DeleteFG == false)
+                   .WhereIf(!string.IsNullOrWhiteSpace(AreaName), a => a.AreaName == AreaName)
+                   .ToTreeListAsync();
+                    var DataModel = _mapper.Map<List<MenuInfo>, List<SideBarNavDataModel>>(MenuList);
+                    return DataModel;
+                }
             }
             catch (Exception ex)
             {
@@ -239,14 +253,14 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var DataEntityList = await _munuRepo.Select.Where(a => a.AreaName == "Admin" && a.DeleteFG == false).ToTreeListAsync();
+                var DataEntityList = await _munuRepo.Select.Where(a => a.DeleteFG == false).ToTreeListAsync();
                 var DataModel = _mapper.Map<List<MenuInfo>, List<LayuiTreeDataModel>>(DataEntityList);
                 return new ResultMessage<List<LayuiTreeDataModel>>(ResponseCode.OperationSuccess, "查询成功", DataModel);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,$"获得树控件数据异常,异常原因为：【{ex.Message}】");
-               return new ResultMessage<List<LayuiTreeDataModel>>(ResponseCode.ServerError, $"获得树控件数据失败",null);
+                _logger.LogError(ex, $"获得树控件数据异常,异常原因为：【{ex.Message}】");
+                return new ResultMessage<List<LayuiTreeDataModel>>(ResponseCode.ServerError, $"获得树控件数据失败", null);
             }
         }
         public async Task InitMenuData(IEnumerable<Type> assemblyList)

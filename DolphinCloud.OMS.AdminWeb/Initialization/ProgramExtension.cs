@@ -87,22 +87,12 @@ namespace DolphinCloud.OMS.AdminWeb.Initialization
         /// <param name="services"></param>
         internal static void ConfigAuthentication(this IServiceCollection services, AuthenticationConfiguration configuration)
         {
-            services.AddAuthentication(option => {
-                //option.DefaultAuthenticateScheme = PermissionPolicy.Customize;
-                //option.DefaultChallengeScheme = PermissionPolicy.Customize;
-                //option.DefaultSignInScheme = PermissionPolicy.Customize;
-                //option.DefaultSignOutScheme = PermissionPolicy.Customize;
-                option.DefaultScheme = PermissionPolicy.Customize;
-                option.AddScheme<CustomizedAuthenticationHandler>(PermissionPolicy.Customize, PermissionPolicy.Customize);
-            });
             services.AddAuthorization(options =>
             {
                 var DefaultPolicy = new AuthorizationPolicyBuilder();
                 DefaultPolicy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.Customize));
                 options.DefaultPolicy = DefaultPolicy.Build();
                 options.AddPolicy(PermissionPolicy.Customize, policy => policy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.Customize)));
-                //options.AddPolicy(PermissionPolicy.ClientArea, policy => policy.Requirements.Add(new CustomizeRequirement(PermissionPolicy.ClientArea)));
-                //options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
             });
             services.AddSingleton<IAuthorizationHandler, CustomizeAuthorizationHandler>();
 
