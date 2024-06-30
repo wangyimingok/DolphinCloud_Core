@@ -509,37 +509,43 @@ namespace DolphinCloud.DataServices.System
                 List<UserRoleRelationInfo> newRoleList = new List<UserRoleRelationInfo>();
                 if (dataModel != null && dataModel.UserID > 0)
                 {
-
-                    var oldRoleList = await _userRoleRelationRepo.Select.Where(a => a.UserID == dataModel.UserID).ToListAsync();
-                    //_userRoleRelationRepo
-                    foreach (var item in dataModel.currentAlreadyRoleList)
-                    {
-                        UserRoleRelationInfo userRoleRelationInfo = new UserRoleRelationInfo();
-                        userRoleRelationInfo.UserID = dataModel.UserID;
-                        userRoleRelationInfo.RoleID = item.TreeID;
-                        if (string.IsNullOrEmpty(_currentUser.UserName))
-                        {
-                            userRoleRelationInfo.CreateBy = "System";
-                        }
-                        else
-                        {
-                            userRoleRelationInfo.CreateBy = _currentUser.UserName;
-                        }
-                        userRoleRelationInfo.CreateDateTime = DateTimeOffset.Now;
-                        userRoleRelationInfo.LastModifyBy = "System";
-                        userRoleRelationInfo.LastModifyDate = DateTimeOffset.Now;
-                        newRoleList.Add(userRoleRelationInfo);
-                    }
                     using (var uow = _userRoleRelationRepo.Orm.CreateUnitOfWork())
                     {
                         _userRoleRelationRepo.UnitOfWork = uow;
-                        if (newRoleList.Any())
+                        var oldRoleList = await _userRoleRelationRepo.Select.Where(a => a.UserID == dataModel.UserID && a.DeleteFG == false).ToListAsync();
+                        var oldRoleIDList = oldRoleList.Select(a => a.RoleID).ToList();
+                        var newRoleIDList = dataModel.currentAlreadyRoleList.Select(a => a.TreeID).ToList();
+                        var addRoleList = newRoleIDList.Except(oldRoleIDList).ToList();
+                        var deleteRoleList = oldRoleIDList.Except(newRoleIDList).ToList();
+                        if (addRoleList.Any())
                         {
-                            await _userRoleRelationRepo.InsertAsync(newRoleList);
+                            var addRoleInfoList = dataModel.currentAlreadyRoleList.Where(a => addRoleList.Contains(a.TreeID)).ToList();
+                            foreach (var item in addRoleInfoList)
+                            {
+                                UserRoleRelationInfo userRoleRelationInfo = new UserRoleRelationInfo();
+                                userRoleRelationInfo.UserID = dataModel.UserID;
+                                userRoleRelationInfo.RoleID = item.TreeID;
+                                if (string.IsNullOrEmpty(_currentUser.UserName))
+                                {
+                                    userRoleRelationInfo.CreateBy = "System";
+                                }
+                                else
+                                {
+                                    userRoleRelationInfo.CreateBy = _currentUser.UserName;
+                                }
+                                userRoleRelationInfo.CreateDateTime = DateTimeOffset.Now;
+                                userRoleRelationInfo.LastModifyBy = "System";
+                                userRoleRelationInfo.LastModifyDate = DateTimeOffset.Now;
+                                newRoleList.Add(userRoleRelationInfo);
+                            }
                         }
-                        if (oldRoleList.Any())
+                        if (deleteRoleList.Any())
                         {
-                            await _userRoleRelationRepo.DeleteAsync(oldRoleList);
+                            await _userRoleRelationRepo.Where(a => a.UserID == dataModel.UserID && deleteRoleList.Contains(a.RoleID))
+                                .ToUpdate().Set(a => a.DeleteFG, true)
+                                .Set(a => a.LastModifyBy, _currentUser.UserName)
+                                .Set(a => a.LastModifyDate, DateTimeOffset.Now)
+                                .ExecuteAffrowsAsync();
                         }
                         uow.Commit();
                         return new OperationMessage(ResponseCode.OperationSuccess, "用户角色配置成功");
@@ -572,12 +578,12 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-              var roleDataList=await  _userRoleRelationRepo.Where(a=>a.UserID==UserID).ToListAsync(a=>a.RoleID);
+                var roleDataList = await _userRoleRelationRepo.Where(a => a.UserID == UserID).ToListAsync(a => a.RoleID);
                 return new ResultMessage<List<int>>(ResponseCode.OperationSuccess, "查询成功", roleDataList);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,$"获取当前用户已经拥有的角色异常,异常原因为:【{ex.Message}】");
+                _logger.LogError(ex, $"获取当前用户已经拥有的角色异常,异常原因为:【{ex.Message}】");
                 return new ResultMessage<List<int>>(ResponseCode.ServerError, "获取当前用户已经拥有的角色查询失败");
             }
         }

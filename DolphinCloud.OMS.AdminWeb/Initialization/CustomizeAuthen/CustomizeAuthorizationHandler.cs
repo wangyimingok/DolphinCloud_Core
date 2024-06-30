@@ -43,6 +43,7 @@ namespace DolphinCloud.OMS.AdminWeb.Initialization.CustomizeAuthen
                     HttpContext httpContext = (HttpContext)context.Resource;
                     if (httpContext != null)
                     {
+
                         var UserID = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                         var UserName = context.User.FindFirst(ClaimTypes.Name)?.Value;
                         string urlAddress = httpContext.Request.Path.Value;
@@ -50,32 +51,44 @@ namespace DolphinCloud.OMS.AdminWeb.Initialization.CustomizeAuthen
                         var controllerName = httpContext.GetRouteValue("controller") + string.Empty;
                         var actionName = httpContext.GetRouteValue("action") + string.Empty;
                         var checkedResult = await _roleData.CheckPermissionAsync(controllerName, actionName, urlAddress);
+                        var requestedWith = httpContext.Request.Headers["X-Requested-With"] + string.Empty;
+                        //如果是Ajax请求允许访问
+                        if (requestedWith.Equals("XMLHttpRequest", StringComparison.OrdinalIgnoreCase))
+                        {
+                            context.Succeed(requirement);
+                            return;
+                        }
                         if (checkedResult)
                         {
                             context.Succeed(requirement);
+                            return;
                         }
                         else
                         {
                             _logger.LogWarning($"用户【{UserName}】,用户ID【{UserID}】访问【{controllerName}/{actionName}】权限校验不通过");
                             context.Fail();
+                            return;
                         }
                     }
                     else
                     {
                         _logger.LogWarning($"权限校验不通过,【httpContext】为空!");
                         context.Fail();
+                        return;
                     }
                 }
                 else
                 {
                     _logger.LogWarning($"权限校验不通过,【context.Resource】为空!");
                     context.Fail();
+                    return;
                 }
             }
             else
             {
                 _logger.LogWarning($"权限校验不通过,用户未登录!");
                 context.Fail();
+                return;
                 //context.
             }
         }

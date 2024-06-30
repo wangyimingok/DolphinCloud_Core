@@ -8,6 +8,7 @@ using DolphinCloud.DataModel.System.Role;
 using DolphinCloud.Framework.Session;
 using DolphinCloud.Repository.System;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace DolphinCloud.DataServices.System
 {
@@ -52,7 +53,7 @@ namespace DolphinCloud.DataServices.System
             _currentUser = currentUserInfo;
             _roleAuthority = roleAuthorityRepository;
             _relationRepository = userRoleRelationRepository;
-            _munuRepo= menuRepository;
+            _munuRepo = menuRepository;
         }
 
 
@@ -222,30 +223,44 @@ namespace DolphinCloud.DataServices.System
             try
             {
                 List<RoleAuthorityDataModel> roleAuthorityDataModels = new List<RoleAuthorityDataModel>();
-                //var oldPermissionDataEntityList = await _roleAuthority.Where(a => a.RoleID == dataModel.RoleID).ToListAsync();
-                //var oldPermissionDataList = _mapper.Map<List<RoleAuthorityDataModel>>(dataEntityList);
+                var oldPermissionDataList = await _roleAuthority.Where(a => a.RoleID == dataModel.RoleID && a.DeleteFG == false).ToListAsync(a => a.MenuID);
                 var newPermissionDataList = GetAuthorDataList(dataModel.RoleID, dataModel.Permissions, roleAuthorityDataModels);
-                var newDataEntityList = _mapper.Map<List<RoleAuthorityInfo>>(newPermissionDataList);
-                foreach (var item in newDataEntityList)
+                var newPermissionIDDataList = newPermissionDataList.Select(a => a.PermissionID).ToList();
+                //对比出当前角色新增和删除的权限数据
+                var deleteList = oldPermissionDataList.Except(newPermissionIDDataList).ToList();
+                var addList = newPermissionIDDataList.Except(oldPermissionDataList).ToList();
+                if (addList.Any())
                 {
-                    if (string.IsNullOrEmpty(_currentUser.UserName))
+                    newPermissionDataList = newPermissionDataList.Where(a => addList.Contains(a.PermissionID)).ToList();
+                    var newDataEntityList = _mapper.Map<List<RoleAuthorityInfo>>(newPermissionDataList);
+                    foreach (var item in newDataEntityList)
                     {
-                        item.CreateBy = "System";
+                        if (string.IsNullOrEmpty(_currentUser.UserName))
+                        {
+                            item.CreateBy = "System";
+                        }
+                        else
+                        {
+                            item.CreateBy = _currentUser.UserName;
+                        }
+                        item.CreateDateTime = DateTimeOffset.Now;
+                        item.LastModifyBy = "System";
+                        item.LastModifyDate = DateTimeOffset.Now;
                     }
-                    else
-                    {
-                        item.CreateBy = _currentUser.UserName;
-                    }
-                    item.CreateDateTime = DateTimeOffset.Now;
-                    item.LastModifyBy = "System";
-                    item.LastModifyDate = DateTimeOffset.Now;
+                    var createDataList = await _roleAuthority.InsertAsync(newDataEntityList);
+                    _logger.LogWarning($"新增权限数据【{createDataList.Count}】条");
                 }
-                //var deleteList = oldPermissionDataList.Except(newPermissionDataList).ToList();
-                //var addList = newPermissionDataList.Except(oldPermissionDataList).ToList();
-                var deleDataCount = await _roleAuthority.DeleteAsync(a => a.RoleID == dataModel.RoleID);
-                _logger.LogWarning($"删除旧权限数据【{deleDataCount}】条");
-                var createDataList = await _roleAuthority.InsertAsync(newDataEntityList);
-                _logger.LogWarning($"新增权限数据【{createDataList.Count}】条");
+                if (deleteList.Any())
+                {
+                    //逻辑删除旧数据
+                    var deleDataCount = await _roleAuthority.Where(a => a.RoleID == dataModel.RoleID && deleteList.Contains(a.MenuID))
+                        .ToUpdate().Set(a => a.DeleteFG, true)
+                        .Set(a => a.LastModifyBy, _currentUser.UserName)
+                        .Set(a => a.LastModifyDate, DateTimeOffset.UtcNow)
+                        .ExecuteAffrowsAsync();
+                    _logger.LogWarning($"删除旧权限数据【{deleDataCount}】条");
+                }
+
                 return new OperationMessage(ResponseCode.OperationSuccess, $"授权成功");
             }
             catch (Exception ex)
@@ -341,7 +356,7 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-                var dataModelList = await _roleRepo.Where(a => !a.DeleteFG).ToListAsync(a => new LayuiTreeDataModel {  TreeID = a.RoleID,  NodeName = a.RoleName });
+                var dataModelList = await _roleRepo.Where(a => !a.DeleteFG).ToListAsync(a => new LayuiTreeDataModel { TreeID = a.RoleID, NodeName = a.RoleName });
                 return new ResultMessage<List<LayuiTreeDataModel>>(ResponseCode.OperationSuccess, "获取角色列表成功", dataModelList);
             }
             catch (Exception ex)
@@ -360,14 +375,14 @@ namespace DolphinCloud.DataServices.System
         {
             try
             {
-              var DataList=await  _roleAuthority.Where(a=>a.RoleID== RoleID).ToListAsync();
-              var treeData = DataList.Select(a => a.MenuID).ToList();
+                var DataList = await _roleAuthority.Where(a => a.RoleID == RoleID).ToListAsync();
+                var treeData = DataList.Select(a => a.MenuID).ToList();
                 return new ResultMessage<List<int>>(ResponseCode.OperationSuccess, "获取角色已有权限成功", treeData);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"获取角色已有权限异常,异常原因为:【{ex.Message}】");
-               return new ResultMessage<List<int>>(ResponseCode.ServerError, "获取角色已有权限失败");
+                return new ResultMessage<List<int>>(ResponseCode.ServerError, "获取角色已有权限失败");
             }
         }
     }

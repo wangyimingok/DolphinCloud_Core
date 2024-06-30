@@ -193,6 +193,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// 修改密码页面视图
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         public async Task<IActionResult> ResetPassword()
         {
             var result = await _user.GetResetPasswordDataModelAsync(_currentUser.UserID);
@@ -203,7 +204,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
             }
             return View();
         }
-
+        [AllowAnonymous]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> ResetPassword([FromBody] ResetPasswordDataModel dataModel)
         {
@@ -215,6 +216,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// 用户基本信息页面视图
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         public async Task<IActionResult> BasicInfo()
         {
             var result = await _user.GetBasicInfoDataModelAsync(_currentUser.UserID);
@@ -231,7 +233,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// </summary>
         /// <param name="dataModel"></param>
         /// <returns></returns>
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken,AllowAnonymous]
         public async Task<JsonResult> UpdateBasicInfo([FromBody] BasicInfoDataModel dataModel)
         {
             var result = await _user.UpdateUserBasicInfoDataAsync(dataModel);
