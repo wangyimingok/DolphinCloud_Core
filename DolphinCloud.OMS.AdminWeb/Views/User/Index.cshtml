@@ -136,8 +136,8 @@
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     type: 2,
-                    area: ['400px', '500px'],
-                    content: '@Url.Action("Edit", "User")?UserID=' + obj.data.userID,
+                    area: ['20%', '25%'],
+                    content: ['@Url.Action("Edit", "User")?UserID=' + obj.data.userID,'no'],
                     end: function () {
                         //回调重新刷新表格
                         table.reload('userTable');
@@ -151,7 +151,7 @@
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     type: 2,
-                    area: ['500px', '500px'],
+                    area: ['20%', '30%'],
                     content: '@Url.Action("ConfigurationRole", "User")?UserID=' + obj.data.userID,
                     btn: ['更新', '关闭'],
                     yes: function (index, layero) {
@@ -182,8 +182,8 @@
                         shade: false,
                         maxmin: true, //开启最大化最小化按钮
                         type: 2,
-                        area: ['400px', '500px'],
-                        content: '@Url.Action("Create", "User")',
+                        area: ['20%', '30%'],
+                        content: ['@Url.Action("Create", "User")','no'],
                         end: function () {
                             //回调重新刷新表格
                             table.reload('userTable');

@@ -125,9 +125,9 @@
                 shade: false,
                 maxmin: true, //开启最大化最小化按钮
                 type: 2,
-                area: ['20%', '25%'],
-                content: '@Url.Action("Edit", "Menu")?MenuID=' + data.menuID,
-                btn: ['更新', '关闭'],
+                area: ['20%','30%'],
+                content: ['@Url.Action("Edit", "Menu")?MenuID=' + data.menuID,'no'],
+                    btn: ['更新', '关闭'],
                 yes: function (index, layero) {
                     var iframeWindow = window['layui-layer-iframe' + index];
                     //获得提交按钮
@@ -183,7 +183,7 @@
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     type: 2,
-                    area: ['700px', '600px'],
+                    area: ['20%', '30%'],
                     content: '@Url.Action("Create", "Menu")',
                     btn: ['创建', '关闭'],
                     yes: function (index, layero) {
