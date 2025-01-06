@@ -113,11 +113,11 @@ namespace DolphinCloud.OMS.AdminWeb.Initialization
                       option.LogoutPath = new PathString("/Account/Logout");
                       option.Cookie = new CookieBuilder
                       {
-                          //HttpOnly = cookieOption.CookieHttpOnly,
+                          HttpOnly = cookieOption.CookieHttpOnly,
                           Name = string.IsNullOrWhiteSpace(cookieOption.CookieName) ? AntiforgeryConstant.CookieName : cookieOption.CookieName,
                           Path = string.IsNullOrWhiteSpace(cookieOption.CookiePath) ? "/" : cookieOption.CookiePath,
-                          //SameSite = SameSiteMode.None,
-                          //SecurePolicy = CookieSecurePolicy.SameAsRequest
+                          SameSite = SameSiteMode.Strict,
+                          SecurePolicy = CookieSecurePolicy.Always
                       };
                   });
             }

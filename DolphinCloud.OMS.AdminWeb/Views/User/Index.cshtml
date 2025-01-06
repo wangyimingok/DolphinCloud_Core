@@ -57,6 +57,8 @@
             page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
                 layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
             },
+            limits: [10, 20, 50,100],
+            limit: 10, // 每页默认显示的数量
             cols: [[
                 { field: 'userID', title: '主键', sort: true },
                 { field: 'userName', title: '用户名', sort: true, align: 'center' },
@@ -159,7 +161,7 @@
                         //获得提交按钮
                         var submit = layero.find('iframe').contents().find('#btnRoleConfigSubmit');
                         //触发按钮点击事件
-                        submit.trigger('click');                       
+                        submit.trigger('click');
                     },
                     end: function () {
                         //回调重新刷新表格

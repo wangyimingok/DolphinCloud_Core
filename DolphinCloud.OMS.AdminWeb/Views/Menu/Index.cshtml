@@ -48,6 +48,8 @@
         page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
             layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
         },
+        limits: [10, 20, 50,100],
+        limit: 10, // 每页默认显示的数量
         cols: [[
             { field: 'menuID', title: '主键', width: 80, sort: true },
             { field: 'parentID', title: '上级菜单主键', sort: true, align: 'center', hide: true },
