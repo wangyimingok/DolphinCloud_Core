@@ -29,6 +29,7 @@
 		<PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
 		<PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
 		<PackageReference Include="Serilog.Expressions" Version="5.0.0" />
+		<PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.1.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\DolphinCloud.AutoMapper\DolphinCloud.AutoMapper.csproj" />
