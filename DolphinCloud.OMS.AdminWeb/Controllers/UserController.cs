@@ -62,6 +62,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="dataModel"></param>
         /// <returns></returns>
         [Menu(MunuType.Button_Function, "创建用户", 2)]
+        [Audited("创建用户")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> CreateUser([FromBody] UserCreateDataModel dataModel)
         {
@@ -130,6 +131,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="dataModel"></param>
         /// <returns></returns>
         [Menu("更新用户信息", MunuType.Button_Function)]
+        [Audited("修改用户信息")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> Edit([FromBody] UserModifyDataModel dataModel)
         {
@@ -182,6 +184,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="dataModel"></param>
         /// <returns></returns>
         [Menu("删除用户信息", MunuType.Button_Function)]
+        [Audited("删除用户信息")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> DeleteUser([FromBody] UserDataViewModel dataModel)
         {
@@ -204,7 +207,14 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
             }
             return View();
         }
+        
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="dataModel"></param>
+        /// <returns></returns>
         [AllowAnonymous]
+        [Audited("修改用户密码")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> ResetPassword([FromBody] ResetPasswordDataModel dataModel)
         {
@@ -261,6 +271,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// </summary>
         /// <param name="dataModel"></param>
         /// <returns></returns>
+        [Audited("配置用户角色")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> ConfigurationRole([FromBody] UserRoleRelationDataModel dataModel)
         {

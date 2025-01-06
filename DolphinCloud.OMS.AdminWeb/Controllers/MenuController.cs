@@ -49,6 +49,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="dataModel"></param>
         /// <returns></returns>
         [Menu(MunuType.Button_Function, "创建菜单", 1)]
+        [Audited("创建菜单")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateMenu([FromBody] MenuCreateDataModel dataModel)
         {
@@ -93,6 +94,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="dataModel"></param>
         /// <returns></returns>
         [Menu(MunuType.Button_Function, "编辑菜单", 2)]
+        [Audited("修改菜单信息")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromBody] MenuModifyDataModel dataModel)
         {
@@ -146,6 +148,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="dataModel"></param>
         /// <returns></returns>
         [Menu(MunuType.Button_Function, "删除菜单", 4)]
+        [Audited("删除菜单信息")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> DeleteMenu([FromBody] MenuDataViewModel dataModel)
         {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DolphinCloud.AutoMapper.Base;
 using DolphinCloud.AutoMapper.System;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,8 @@ namespace DolphinCloud.AutoMapper
                 cfg.AddProfile<UserMapperProfile>();
                 //角色信息配置映射
                 cfg.AddProfile<RoleMapperProfile>();
+                //审计日志映射
+                cfg.AddProfile<AudiotLogMapperProfile>();
             });
         }
     }

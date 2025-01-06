@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using DolphinCloud.Common.Attributes;
 
 namespace DolphinCloud.OMS.AdminWeb.Controllers
 {
@@ -66,7 +67,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// </summary>
         /// <param name="loginData"></param>
         /// <returns></returns>
-        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
+        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken, Audited("用户登陆")]
         public async Task<JsonResult> Login(LoginDataModel loginData)
         {
             try
@@ -157,7 +158,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// 注销
         /// </summary>
         /// <returns></returns>
-        [AllowAnonymous, HttpGet]
+        [AllowAnonymous, HttpGet, Audited("用户注销登陆")]
         public async Task<JsonResult> LoginOut()
         {
             if (HttpContext.User.Identity.IsAuthenticated)

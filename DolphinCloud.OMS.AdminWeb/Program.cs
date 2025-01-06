@@ -10,6 +10,7 @@ using Serilog.Exceptions;
 using DolphinCloud.AutoMapper;
 using DolphinCloud.Repository;
 using DolphinCloud.Common.Extentions;
+using DolphinCloud.OMS.AdminWeb.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 // 指定应用运行时配置文件
@@ -39,8 +40,8 @@ builder.Host.ConfigureServices((buidler, services) =>
 builder.Services.AddControllersWithViews(option =>
 {
     option.SuppressAsyncSuffixInActionNames = false;
-    //添加用于防CSRF攻击的过滤器特性
-    //option.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+    //添加审计日志过滤器特性
+    option.Filters.Add<AuditLogFilter>();
 }).AddNewtonsoftJson(option =>
 {
     option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;

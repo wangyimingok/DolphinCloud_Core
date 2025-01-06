@@ -61,6 +61,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="pagination"></param>
         /// <returns></returns>
         [Menu("创建角色", MunuType.Button_Function)]
+        [Audited("创建角色信息")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> CreateRole([FromBody] RoleCreateDataModel dataModel)
         {
@@ -90,6 +91,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="pagination"></param>
         /// <returns></returns>
         [Menu("更新角色信息", MunuType.Button_Function)]
+        [Audited("修改角色信息")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> UpdateRole([FromBody] RoleModifyDataModel dataModel)
         {
@@ -104,6 +106,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="pagination"></param>
         /// <returns></returns>
         [Menu("删除角色信息", MunuType.Button_Function)]
+        [Audited("删除角色信息")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> DeleteRole([FromBody] RoleDataViewModel dataModel)
         {
@@ -131,6 +134,7 @@ namespace DolphinCloud.OMS.AdminWeb.Controllers
         /// <param name="dataModel"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
+        [Audited("角色授权")]
         public async Task<JsonResult> Authorization([FromBody] RoleAuthorDataModel dataModel)
         {
             var result = await _roleData.ConfigPermissionByRoleAsync(dataModel);
