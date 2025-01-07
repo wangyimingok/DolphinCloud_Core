@@ -1,0 +1,79 @@
+﻿@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@model DolphinCloud.DataModel.Config.SalesChannel.SalesChannelCreateDataModel
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" method="post">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">销售渠道名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" asp-for="ChannelName" id="channelName" lay-verify="required" autocomplete="off" placeholder="请输入销售渠道名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">销售渠道编码</label>
+                    <div class="layui-input-block">
+                        <input type="text" asp-for="ChannelCode" id="channelCode" lay-verify="required" autocomplete="off" placeholder="请输入销售渠道名称" class="layui-input">
+                    </div>
+                </div>               
+                <div class="layui-form-item layui-layout-admin">
+                    <div class="layui-input-block">
+                        <div class="layui-footer" style="left: 0;">
+                            <button class="layui-btn" lay-submit="" lay-filter="salesChannelCreate-submit">立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var $ = layui.$;
+    var form = layui.form;
+    var layer = layui.layer;
+    var util = layui.util;
+    form.on('submit(salesChannelCreate-submit)', function (data) {
+        var field = data.field; // 获取表单字段值
+        console.log("请求参数为:" + JSON.stringify(field));
+        // 显示填写结果，仅作演示用
+        // layer.alert(JSON.stringify(field), {
+        //     title: '当前填写的字段值'
+        // });
+        // 此处可执行 Ajax 等操作
+        // …
+        $.ajax({
+            url: "@Url.Action("CreateSaleChannel", "SalesChannel")",
+            type: 'POST',
+            dataType: "JSON",
+            data: JSON.stringify(field),
+            contentType: "application/json;charset=utf-8",
+            headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+            success: function (data) {
+                if (data.responseCode == 200) {
+                    layer.msg(data.message, { icon: 1, offset: 'auto', time: 2000 }, function () {
+                        // debugger;
+                        //同时关闭上一级弹出层
+                        var index = parent.layer.getFrameIndex(window.name); // 获取当前 iframe 层的索引
+                        parent.layer.close(index); // 关闭当前 iframe 弹层
+                    });
+                    //return;
+                }
+                else {
+                    layer.msg(data.message, { icon: 2, offset: 'auto', time: 5000 });
+                    //return;
+                }
+            },
+            error: function (data) {
+                alert(data);
+                console.log(data);
+            }
+        });
+        return false; // 阻止默认 form 跳转
+    });
+</script>

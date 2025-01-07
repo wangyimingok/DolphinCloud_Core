@@ -11,6 +11,7 @@ using DolphinCloud.AutoMapper;
 using DolphinCloud.Repository;
 using DolphinCloud.Common.Extentions;
 using DolphinCloud.OMS.AdminWeb.Filters;
+using DolphinCloud.Repository.AOP;
 
 var builder = WebApplication.CreateBuilder(args);
 // 指定应用运行时配置文件
@@ -89,7 +90,11 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
-
+app.Use(async (context, next) =>
+{
+    TransactionalAttribute.SetServiceProvider(context.RequestServices);
+    await next();
+});
 app.UseStaticFiles();
 //app.UseMiddleware<InitSystemDataMiddleware>();
 app.UseRouting();

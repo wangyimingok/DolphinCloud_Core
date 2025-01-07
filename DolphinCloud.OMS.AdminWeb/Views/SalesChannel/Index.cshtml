@@ -1,0 +1,130 @@
+﻿@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@{
+    Layout = "_PageLayout";
+}
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">销售渠道列表</div>
+                <div class="layui-card-body">
+                    <fieldset class="table-search-fieldset">
+                        <legend>搜索信息</legend>
+                        <div>
+                            <form class="layui-form layui-form-pane" action="">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">渠道编码</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="channelCode" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">渠道名称</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="channelName" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <script type="text/html" id="saleschannelToolbar">
+                            <div class="layui-btn-container">
+                              <button class="layui-btn layui-btn-sm" lay-event="createSalesChannel">创建销售渠道</button>
+                            </div>
+                        </script>
+                        <table class="layui-hide" id="saleschannelTable" lay-filter="saleschannelTable"></table>
+                        <script type="text/html" id="saleschannelBar">
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                        </script>
+
+                    </fieldset>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var element = layui.element,
+      form = layui.form,
+      layer = layui.layer,
+      table = layui.table,
+      $ = layui.$,
+      laytpl = layui.laytpl;
+       var tableIns = table.render({
+        elem: '#saleschannelTable',
+        url: "@Url.Action("GetSaleChannelPaginationDataList", "SalesChannel")",
+        method: "POST",
+        contentType: "application/json",
+        headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+        defaultToolbar: ['filter', 'print', 'exports'],
+        toolbar: '#saleschannelToolbar',
+        page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+            layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+        },
+        limits: [10, 20, 50,100],
+        limit: 10, // 每页默认显示的数量
+        cols: [[
+            { field: 'channelID', title: '数据主键', width: 80, hide: true },
+            { field: 'channelCode', title: '销售渠道编码', sort: true, align: 'center' },
+            { field: 'channelName', title: '销售渠道名称', sort: true, align: 'center' },
+            { field: 'createBy', title: '创建人', sort: true, align: 'center' },
+            { field: 'createDateTime', title: '创建时间', sort: true, align: 'center' },
+            { field: 'lastModifyBy', title: '最后修改人', sort: true, align: 'center' },
+            { field: 'lastModifyDateTime', title: '最后修改时间', sort: true, align: 'center' },
+            { fixed: 'right', title: '操作', sort: true, toolbar: '#saleschannelBar' }
+        ]],
+        response: {
+            //重新规定成功的状态码为 200，table 组件默认为 0
+            statusCode: 200
+        }
+    });
+    // 监听搜索操作
+            form.on('submit(data-search-btn)', function (data) {
+                var result = JSON.stringify(data.field);
+                console.log(result);
+                tableIns.reload({
+                    where: { //设定异步数据接口的额外参数，任意设
+                        channelCode: data.field.channelCode,
+                        channelName: data.field.channelName
+                    },
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+                return false;
+            });
+    // 工具栏事件
+    table.on('toolbar(saleschannelTable)', function (obj) {
+        var id = obj.config.id;
+        var checkStatus = table.checkStatus(id);
+        var othis = lay(this);
+        switch (obj.event) {
+            case 'createSalesChannel':
+                layer.open({
+                        title: '创建销售渠道',
+                        shadeClose: true,
+                        shade: false,
+                        maxmin: true, //开启最大化最小化按钮
+                        type: 2,
+                        area: ['20%', '30%'],
+                        content: ['@Url.Action("CreateSaleChannel", "SalesChannel")','no'],
+                        end: function () {
+                            //回调重新刷新表格
+                            table.reload('saleschannelTable');
+                        }
+                    });
+                break;
+        }
+    });
+</script>

@@ -1,0 +1,124 @@
+﻿@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@{
+    Layout = "_PageLayout";
+}
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">销售渠道列表</div>
+                <div class="layui-card-body">
+                    <fieldset class="table-search-fieldset">
+                        <legend>搜索信息</legend>
+                        <div>
+                            <form class="layui-form layui-form-pane" action="">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">日志级别</label>
+                                        <div class="layui-input-inline">
+                                            <select name="level" lay-filter="level">
+                                                <option value=""></option>
+                                                <option value="Debug">调试</option>
+                                                <option value="Information">信息</option>
+                                                <option value="Warning">警告</option>
+                                                <option value="Error">异常</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">日志消息</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="message" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">异常信息</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="exception" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <table class="layui-hide" id="systemLogTable" lay-filter="systemLogTable"></table>
+
+                    </fieldset>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var element = layui.element,
+      form = layui.form,
+      layer = layui.layer,
+      table = layui.table,
+      $ = layui.$,
+      dropdown = layui.dropdown,
+      laytpl = layui.laytpl;
+
+       var tableIns = table.render({
+        elem: '#systemLogTable',
+        url: "@Url.Action("GetSystemLogPaginationResultAsync", "SystemLog")",
+        method: "POST",
+        contentType: "application/json",
+        headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+        defaultToolbar: ['filter', 'print', 'exports'],
+        page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+            layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+        },
+        limits: [10, 20, 50,100],
+        limit: 10, // 每页默认显示的数量
+        cols: [[
+            { field: 'id', title: '数据主键', width: 80, hide: true },
+            { field: 'level', title: '日志级别', width: 150,sort: true, align: 'center',  templet:
+            function(d){
+                 if (d.level == 'Information') {
+                            return ' <span class="layui-badge layui-bg-green">信息</span>';
+                        } else if (d.level == 'Warning') {
+                            return ' <span class="layui-badge layui-bg-orange">警告</span>';
+                        } else if (d.level == 'Error') {
+                            return ' <span class="layui-badge">异常</span>';
+                        }else if(d.level == 'Debug'){
+                             return ' <span class="layui-badge layui-bg-cyan">调试</span>';
+                        }else{
+                        return d.level;
+                        }
+            }},
+            { field: 'timeStamp', title: '记录时间',width: 200, sort: true, align: 'center' },
+            { field: 'message', title: '日志消息' },
+            { field: 'exception', title: '异常信息'},
+            { field: 'messageTemplate', title: '消息模板'},
+            { field: 'properties', title: '日志属性'}
+        ]],
+        response: {
+            //重新规定成功的状态码为 200，table 组件默认为 0
+            statusCode: 200
+        }
+    });
+    // 监听搜索操作
+            form.on('submit(data-search-btn)', function (data) {
+                var result = JSON.stringify(data.field);
+                console.log(result);
+                tableIns.reload({
+                    where: { //设定异步数据接口的额外参数，任意设
+                        level: data.field.level,
+                        message: data.field.message,
+                        exception: data.field.exception
+                    },
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+                return false;
+            });
+</script>

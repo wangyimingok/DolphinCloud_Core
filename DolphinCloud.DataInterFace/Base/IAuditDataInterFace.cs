@@ -18,5 +18,7 @@ namespace DolphinCloud.DataInterFace.Base
         /// <param name="auditLogs">审计日志</param>
         /// <returns></returns>
         Task AddAuditLogs(AuditLogCreateDataModel auditLogs);
+
+
     }
 }

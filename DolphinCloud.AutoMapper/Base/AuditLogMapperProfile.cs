@@ -12,9 +12,9 @@ namespace DolphinCloud.AutoMapper.Base
     /// <summary>
     /// 审计日志映射配置
     /// </summary>
-    public class AudiotLogMapperProfile : Profile
+    public class AuditLogMapperProfile : Profile
     {
-        public AudiotLogMapperProfile()
+        public AuditLogMapperProfile()
         {
             CreateMap<AuditLogInfo, AuditLogCreateDataModel>().ReverseMap();
             CreateMap<AuditLogInfo, AuditLogDataViewModel>().ReverseMap();

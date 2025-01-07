@@ -16,12 +16,12 @@ namespace DolphinCloud.Common.Pagination
         /// 当前页码
         /// </summary>
         [JsonProperty("page")]
-        public int PageIndex { get; set; }
+        public int PageIndex { get; set; } = 1;
 
         /// <summary>
         /// 每页数据条数
         /// </summary>
         [JsonProperty("limit")]
-        public int PageSize { get; set; }
+        public int PageSize { get; set; } = 10;
     }
 }
