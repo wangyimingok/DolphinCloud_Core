@@ -4,17 +4,15 @@
         return Xsrf.GetAndStoreTokens(Context).RequestToken;
     }
 }
-@{
-    Layout = "_PageLayout";
-}
+
 <div class="layui-fluid">
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">销售渠道列表</div>
+                <div class="layui-card-header">系统日志</div>
                 <div class="layui-card-body">
                     <fieldset class="table-search-fieldset">
-                        <legend>搜索信息</legend>
+                        <legend>日志</legend>
                         <div>
                             <form class="layui-form layui-form-pane" action="">
                                 <div class="layui-form-item">
@@ -58,6 +56,7 @@
     </div>
 </div>
 <script type="text/javascript">
+
     var element = layui.element,
       form = layui.form,
       layer = layui.layer,
@@ -68,7 +67,7 @@
 
        var tableIns = table.render({
         elem: '#systemLogTable',
-        url: "@Url.Action("GetSystemLogPaginationResultAsync", "SystemLog")",
+        url: "@Url.Action("GetSystemLogPaginationResult", "Logs")",
         method: "POST",
         contentType: "application/json",
         headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },

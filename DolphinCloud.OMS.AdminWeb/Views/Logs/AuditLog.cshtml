@@ -1,0 +1,135 @@
+﻿@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@{
+    Layout = "_PageLayout";
+}
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">审计日志</div>
+                <div class="layui-card-body">
+                    <fieldset class="table-search-fieldset">
+                        <legend>列表</legend>
+                        <div>
+                            <form class="layui-form layui-form-pane" action="">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">事件类型</label>
+                                        <div class="layui-input-inline">
+                                            <select name="eventType" lay-filter="eventType" id="eventType">
+                                                <option value="">请选择</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">用户ID</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="userID" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">用户名</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="userName" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">方法名</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="methodName" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <table class="layui-hide" id="auditLogTable" lay-filter="auditLogTable"></table>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.config({
+           base: '@Url.Content("~/lib/layuiadmin/")' // 静态资源所在路径
+       }).use(['form', 'layer','table'], function (){
+            var table=layui.table,
+            form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+            var tableIns = table.render({
+                elem: '#auditLogTable',
+                url: "@Url.Action("GetAuditLogPaginationResult", "Logs")",
+                method: "POST",
+                contentType: "application/json",
+                headers: { "X-CSRF-TOKEN": '@GetAntiXsrfRequestToken()' },
+                defaultToolbar: ['filter', 'print', 'exports'],
+                page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                    layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+                },
+                limits: [10, 20, 50,100],
+                limit: 10, // 每页默认显示的数量
+                cols: [[
+                    { field: 'logID', title: '数据主键', width: 80, hide: true },
+                    { field: 'systemName', title: '系统名称', width: 100  },
+                    { field: 'eventType', title: '事件类型',width: 200, sort: true, align: 'center' },
+                    { field: 'userID', title: '用户数据主键' },
+                    { field: 'userName', title: '用户名'},
+                    { field: 'serviceName', title: '服务名'},
+                    { field: 'methodName', title: '方法名称'},
+                    { field: 'parameters', title: '参数'},
+                    { field: 'returnValue', title: '返回值'},
+                    { field: 'executionTime', title: '执行开始时间',sort: true},
+                    { field: 'executionDuration', title: '持续时间',sort: true},
+                    { field: 'ipAddress', title: '来源IP地址'},
+                    { field: 'exception', title: '异常信息'},
+                    { field: 'description', title: '说明'}
+                ]],
+                response: {
+                    //重新规定成功的状态码为 200，table 组件默认为 0
+                    statusCode: 200
+                }
+            });
+            $.ajax({
+            url: "@Url.Action("GetAuditEventTypeSelectOption", "Logs")",
+            type: 'GET',
+            success: function (data) {
+                if (data.responseCode == 200) {
+                    $.each(data.data, function (index, item) {
+                        $('#eventType').append(new Option(item.optionName, item.optionValue));// 下拉菜单里添加元素
+                    });
+                    layui.form.render("select");
+                }
+            },
+            error: function (data) {
+                alert(data);
+                console.log(data);
+            }
+            });
+            form.on('submit(data-search-btn)', function (data) {
+                var result = JSON.stringify(data.field);
+                console.log(result);
+                tableIns.reload({
+                    where: { //设定异步数据接口的额外参数，任意设
+                        eventType:data.field.eventType,
+                        userID: data.field.userID,
+                        userName: data.field.userName,
+                        methodName: data.field.methodName
+                    },
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+                return false;
+            });
+       });
+          
+</script>

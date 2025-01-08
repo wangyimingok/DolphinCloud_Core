@@ -24,5 +24,14 @@ namespace DolphinCloud.DataModel.Base
         /// </summary>
         [JsonProperty("optionValue")]
         public string OptionValue { get; set; }
+
+        public OptionDataModel(string name, string value)
+        {
+            this.OptionName = name;
+            this.OptionValue = value;
+        }
+
+        public OptionDataModel()
+        { }
     }
 }

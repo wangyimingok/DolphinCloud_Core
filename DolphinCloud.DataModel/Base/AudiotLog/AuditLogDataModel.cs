@@ -46,7 +46,7 @@ namespace DolphinCloud.DataModel.Base.AudiotLog
         /// 方法执行的开始时间
         /// </summary>
         [JsonProperty]
-        public DateTime? ExecutionTime { get; set; }
+        public DateTimeOffset? ExecutionTime { get; set; }
 
         /// <summary>
         /// 用户的IP地址
